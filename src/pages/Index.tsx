@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import { ArrowRight, CalendarCheck2, Shield, Users, Sparkles } from "lucide-react";
 import { BrandLogo } from "../components/brand-logo";
 import { Button } from "../components/ui/button";
@@ -9,7 +10,7 @@ function Index() {
         <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 lg:px-8">
           <BrandLogo />
           <div className="flex items-center gap-2">
-            <Button asChild variant="ghost" size="sm"><a href="/login">Sign in</a></Button>
+            <Button asChild variant="ghost" size="sm"><Link to="/login">Sign in</Link></Button>
             <Button asChild size="sm"><a href="/register">Get started</a></Button>
           </div>
         </div>
