@@ -29,3 +29,16 @@ export default function DesignColors() {
 
  return C;
 }
+
+export const Colors = {
+  primary: "#4648d4",
+  primaryContainer: "#6063ee",
+  onPrimary: "#ffffff",
+  surface: "#fcf8ff",
+  surfaceContainerLow: "#f5f2fe",
+  surfaceContainer: "#efecf8",
+  onSurface: "#1b1b23",
+  onSurfaceVariant: "#464554",
+  outlineVariant: "#c7c4d7",
+  background: "#fcf8ff",
+};

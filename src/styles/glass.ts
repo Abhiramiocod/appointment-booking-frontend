@@ -7,3 +7,11 @@ export const glass: React.CSSProperties = {
   border: "1px solid rgba(255,255,255,0.4)",
   boxShadow: "0 8px 32px 0 rgba(70,72,212,0.05)",
 };
+
+export const  glassCard: React.CSSProperties = {
+    background: "rgba(255,255,255,0.7)",
+    backdropFilter: "blur(24px)",
+    WebkitBackdropFilter: "blur(24px)",
+    border: "1px solid rgba(255,255,255,0.4)",
+    boxShadow: "0 8px 32px 0 rgba(31,38,135,0.07)",
+};

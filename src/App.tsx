@@ -1,37 +1,27 @@
-import { useCallback } from "react";
-import { Navigate, Route, Routes, useNavigate } from "react-router-dom";
-import "./App.css";
+import { Navigate, Route, Routes } from "react-router-dom";
 
 import Index from "./pages/Index";
-import LoginPage from "./pages/Login";
+import Login from "./pages/Login";
 
-function IndexRoute() {
-  const navigate = useNavigate();
-
-  const goLogin = useCallback(() => {
-    navigate("/login");
-    window.scrollTo({ top: 0 });
-  }, [navigate]);
-
-  return <Index onLogin={goLogin} />;
-}
-
-function LoginRoute() {
-  const navigate = useNavigate();
-
-  const goBack = useCallback(() => {
-    navigate("/");
-    window.scrollTo({ top: 0 });
-  }, [navigate]);
-
-  return <LoginPage onBack={goBack} />;
-}
+import AdminDashboard from "./pages/Admin/Dashboard";
+import StaffDashboard from "./pages/Staff/Dashboard";
+import CustomerDashboard from "./pages/Customer/Dashboard";
+import Register from "./pages/Register";
 
 export default function App() {
   return (
     <Routes>
-      <Route path="/" element={<IndexRoute />} />
-      <Route path="/login" element={<LoginRoute />} />
+      {/* Public Routes */}
+      <Route path="/" element={<Index />} />
+      <Route path="/login" element={<Login />} />
+      <Route path="/register" element={<Register />} />
+
+      {/* Role-based Dashboards */}
+      <Route path="/admin" element={<AdminDashboard />} />
+      <Route path="/staff" element={<StaffDashboard />} />
+      <Route path="/customer" element={<CustomerDashboard />} />
+
+      {/* 404 */}
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );
