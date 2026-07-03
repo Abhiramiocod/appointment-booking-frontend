@@ -41,4 +41,8 @@ export const Colors = {
   onSurfaceVariant: "#464554",
   outlineVariant: "#c7c4d7",
   background: "#fcf8ff",
+  surfaceContainerHigh: "#e9e6f3",
+  surfaceContainerHighest: "#e4e1ed",
+  secondaryContainer: "#dae2fd",
+  error: "#ba1a1a",
 };

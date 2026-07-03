@@ -1,6 +1,6 @@
 import { Colors } from "../../lib/utils";
-import googleIcon from "../../../public/images/google.webp";
-import appleIcon from "../../../public/images/apple.svg";
+import googleIcon from "../../assets/images/google.webp";
+import appleIcon from "../../assets/images/apple.svg";
 import FloatingInput from "./FloatingInputs";
 import PasswordInput from "./PasswordInputs";
 import { Link } from "react-router-dom";

@@ -1,6 +1,6 @@
 import SocialButton from "./SocialButton";
-import AppleLogo from "../../../public/images/apple.svg";
-import GoogleLogo from "../../../public/images/google.webp";
+import AppleLogo from "../../assets/images/apple.svg";
+import GoogleLogo from "../../assets/images/google.webp";
 
 export default function SocialLogin() {
     return (
