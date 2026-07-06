@@ -46,3 +46,9 @@ export const Colors = {
   secondaryContainer: "#dae2fd",
   error: "#ba1a1a",
 };
+
+export const statusStyles = {
+    Confirmed: { bg: "#dcfce7", text: "#15803d", dot: "#22c55e" },
+    Pending: { bg: "#fef3c7", text: "#b45309", dot: "#f59e0b" },
+    "In Progress": { bg: "#dbeafe", text: "#1d4ed8", dot: "#3b82f6" },
+  };
