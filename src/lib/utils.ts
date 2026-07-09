@@ -51,4 +51,6 @@ export const statusStyles = {
     Confirmed: { bg: "#dcfce7", text: "#15803d", dot: "#22c55e" },
     Pending: { bg: "#fef3c7", text: "#b45309", dot: "#f59e0b" },
     "In Progress": { bg: "#dbeafe", text: "#1d4ed8", dot: "#3b82f6" },
+    Completed: { bg: "#e0e7ff", text: "#3730a3", dot: "#6366f1" },
+    Cancelled: { bg: "#fee2e2", text: "#991b1b", dot: "#ef4444" },
   };

@@ -3,7 +3,46 @@ import { Colors } from "../../../lib/utils";
 import StatusBadge from "./StatusBadge";
 import AppointmentDropdown from "./AppointmentDropdown";
 
-export default function AppointmentsTable({ rows, onRowClick }) {
+interface RawAppointment {
+  id?: number;
+  customer?: { id?: number; name?: string };
+  staff?: { id?: number; name?: string };
+  service?: { id?: number; name?: string; duration?: number; price?: string };
+  appointment_date?: string;
+  start_time?: string;
+  end_time?: string;
+  status?: string;
+  notes?: string;
+  created_at?: string;
+  updated_at?: string;
+}
+
+interface Appointment {
+  id: number;
+  initials: string;
+  name: string;
+  email: string;
+  service: string;
+  staff: string;
+  date: string;
+  time: string;
+  status: string;
+  customerSince: string;
+  serviceType: string;
+  duration: string;
+  notes: string;
+  history: { date: string; detail: string; current: boolean }[];
+  rawData: RawAppointment;
+}
+
+interface AppointmentsTableProps {
+  rows: Appointment[];
+  onRowClick: (row: Appointment) => void;
+  onEdit: (row: Appointment) => void;
+  onDelete: (row: Appointment) => void;
+}
+
+export default function AppointmentsTable({ rows, onRowClick, onEdit, onDelete }: AppointmentsTableProps) {
   const headers = ["Customer", "Service", "Staff", "Date & Time", "Status", ""];
   return (
     <div
@@ -120,8 +159,8 @@ export default function AppointmentsTable({ rows, onRowClick }) {
                 <td className="px-6 py-5 text-right">
                   <div onClick={(e) => e.stopPropagation()}>
                     <AppointmentDropdown
-                      onEdit={() => console.log("Edit", row)}
-                      onDelete={() => console.log("Delete", row)}
+                      onEdit={() => onEdit(row)}
+                      onDelete={() => onDelete(row)}
                     />
                   </div>
                 </td>
