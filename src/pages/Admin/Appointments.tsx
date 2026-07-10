@@ -165,6 +165,16 @@ export default function Appointments() {
     fetchAppointments();
   }, [searchParams]);
 
+  useEffect(() => {
+    const handleCreated = () => {
+      fetchAppointments();
+    };
+    window.addEventListener("appointment-created", handleCreated);
+    return () => {
+      window.removeEventListener("appointment-created", handleCreated);
+    };
+  }, []);
+
   // Edit handlers
   const onEditClick = (row: AppointmentViewModel) => {
     setEditingAppointment(row.dto);
