@@ -1,7 +1,11 @@
 import { Calendar } from "lucide-react";
 import { Colors } from "../../../lib/utils";
 
-export default function FilterBar({ onReset }) {
+interface FilterBarProps {
+  onReset: () => void;
+}
+
+export default function FilterBar({ onReset }: FilterBarProps) {
   const selectStyle = {
     backgroundColor: Colors.surfaceContainerHigh,
     color: Colors.onSurface,

@@ -1,12 +1,16 @@
 import { statusStyles } from "../../../lib/utils";
 
-export default function StatusBadge({ status }) {
+interface StatusBadgeProps {
+  status: string;
+}
+
+export default function StatusBadge({ status }: StatusBadgeProps) {
   const normalizedStatus =
     status
       ?.replace(/_/g, " ")
-      .replace(/\b\w/g, c => c.toUpperCase()) || "Confirmed";
+      .replace(/\b\w/g, (c: string) => c.toUpperCase()) || "Confirmed";
 
-  const s = statusStyles[normalizedStatus] || statusStyles.Confirmed;
+  const s = statusStyles[normalizedStatus as keyof typeof statusStyles] || statusStyles.Confirmed;
 
   return (
     <span

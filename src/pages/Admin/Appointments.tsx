@@ -7,47 +7,16 @@ import AppointmentsTable from "../../components/Admin/Appointments/AppointmentsT
 import EditAppointmentModal from "../../components/Admin/Appointments/EditAppointmentModal";
 import DeleteConfirmationDialog from "../../components/Admin/Appointments/DeleteConfirmationDialog";
 import Toast from "../../components/Toast";
-
-interface RawAppointment {
-  id?: number;
-  customer?: { id?: number; name?: string };
-  staff?: { id?: number; name?: string };
-  service?: { id?: number; name?: string; duration?: number; price?: string };
-  appointment_date?: string;
-  start_time?: string;
-  end_time?: string;
-  status?: string;
-  notes?: string;
-  created_at?: string;
-  updated_at?: string;
-}
-
-interface Appointment {
-  id: number;
-  initials: string;
-  name: string;
-  email: string;
-  service: string;
-  staff: string;
-  date: string;
-  time: string;
-  status: "Confirmed" | "Pending" | "In Progress" | string;
-  customerSince: string;
-  serviceType: string;
-  duration: string;
-  notes: string;
-  history: { date: string; detail: string; current: boolean }[];
-  rawData: RawAppointment;
-}
+import type { AppointmentDto, AppointmentViewModel } from "../../types/Admin/Appointments/appointments";
 
 export default function Appointments() {
-  const [selected, setSelected] = useState<Appointment | null>(null);
-  const [appointments, setAppointments] = useState<Appointment[]>([]);
+  const [selected, setSelected] = useState<AppointmentViewModel | null>(null);
+  const [appointments, setAppointments] = useState<AppointmentViewModel[]>([]);
   const [loading, setLoading] = useState(true);
 
   // Edit state
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [editingAppointment, setEditingAppointment] = useState<RawAppointment | null>(null);
+  const [editingAppointment, setEditingAppointment] = useState<AppointmentDto | null>(null);
   const [isSaveLoading, setIsSaveLoading] = useState(false);
 
   // Delete state
@@ -59,38 +28,40 @@ export default function Appointments() {
   const [toast, setToast] = useState<{type: "success" | "error"; message: string} | null>(null);
 
   // Transform helper function
-  const transformAppointment = (item: RawAppointment, index: number): Appointment => ({
-    id: item.id || index,
-    initials:
-      item.customer?.name
-        ?.split(" ")
-        .map((n: string) => n[0])
-        .join("")
-        .toUpperCase() || "CU",
-    name: item.customer?.name || "Unknown",
-    email: "N/A",
-    service: item.service?.name || "Service",
-    staff: item.staff?.name || "Staff",
-    date: new Date(item.appointment_date || Date.now()).toLocaleDateString("en-US", {
-      year: "numeric",
-      month: "short",
-      day: "numeric",
-    }),
-    time: `${item.start_time} - ${item.end_time}`,
-    status: item.status || "Pending",
-    customerSince: "January 2024",
-    serviceType: item.service?.name || "Service",
-    duration: "60 Minutes",
-    notes: item.notes || "",
-    history: [
-      {
-        date: "Oct 12, 2024",
-        detail: "Completed • $145.00 • Staff: Sarah Chen",
-        current: true,
-      },
-    ],
-    rawData: item,
-  });
+  const transformAppointment = (item: AppointmentDto, index: number): AppointmentViewModel => {
+    const initials = item.customer?.name
+      ?.split(" ")
+      .map((n: string) => n[0])
+      .join("")
+      .toUpperCase() || "";
+
+    const formattedDate = item.appointment_date
+      ? new Date(item.appointment_date).toLocaleDateString("en-US", {
+          year: "numeric",
+          month: "short",
+          day: "numeric",
+        })
+      : "";
+
+    const formattedTime = item.start_time && item.end_time
+      ? `${item.start_time.slice(0, 5)} - ${item.end_time.slice(0, 5)}`
+      : "";
+
+    return {
+      id: item.id || index,
+      initials,
+      customerName: item.customer?.name || "",
+      customerEmail: "",
+      serviceName: item.service?.name || "",
+      staffName: item.staff?.name || "",
+      formattedDate,
+      formattedTime,
+      status: item.status || "",
+      duration: item.service?.duration ? `${item.service.duration} Minutes` : "",
+      history: [],
+      dto: item,
+    };
+  };
 
   // Fetch appointments from API
   useEffect(() => {
@@ -101,22 +72,22 @@ export default function Appointments() {
         const data = response.data;
 
         // Handle case where data might be an object with a data property
-        let appointmentsArray: RawAppointment[];
+        let appointmentsArray: AppointmentDto[];
         if (Array.isArray(data)) {
-          appointmentsArray = data as RawAppointment[];
+          appointmentsArray = data as AppointmentDto[];
         } else if (
           data &&
           typeof data === "object" &&
           Array.isArray(data.data)
         ) {
-          appointmentsArray = data.data as RawAppointment[];
+          appointmentsArray = data.data as AppointmentDto[];
         } else {
           console.warn("⚠️ Appointments API response is not an array:", data);
           appointmentsArray = [];
         }
 
         // Transform API data to match our component's format
-        const transformed: Appointment[] = appointmentsArray.map(transformAppointment);
+        const transformed: AppointmentViewModel[] = appointmentsArray.map(transformAppointment);
         setAppointments(transformed);
       } catch (err) {
         console.error(err);
@@ -130,28 +101,26 @@ export default function Appointments() {
   }, []);
 
   // Edit handlers
-  const onEditClick = (row: Appointment) => {
-    setEditingAppointment(row.rawData);
+  const onEditClick = (row: AppointmentViewModel) => {
+    setEditingAppointment(row.dto);
     setIsEditModalOpen(true);
   };
 
-  const handleSaveEdit = async (appointmentId: number, data: Partial<RawAppointment>) => {
+  const handleSaveEdit = async (appointmentId: number, data: Partial<AppointmentDto>) => {
     setIsSaveLoading(true);
+    console.log(data);
     try {
       const response = await api.patch(`/admin/appointments/${appointmentId}`, data);
       
-      // Handle case where response has { data: ... } wrapper
-      let updatedAppointment: RawAppointment;
+      let updatedAppointment: AppointmentDto;
       if (response.data && response.data.data) {
         updatedAppointment = response.data.data;
       } else if (response.data) {
         updatedAppointment = response.data;
       } else {
-        // Fallback to updating with the data we sent plus existing data
-        updatedAppointment = { ...editingAppointment, ...data };
+        updatedAppointment = { ...(editingAppointment || {}), ...data } as AppointmentDto;
       }
 
-      // Update local state immediately
       setAppointments(prev => prev.map(appt => {
         if (appt.id === appointmentId) {
           return transformAppointment(updatedAppointment, appt.id);
@@ -160,16 +129,15 @@ export default function Appointments() {
       }));
       setIsEditModalOpen(false);
       setToast({ type: "success", message: "Appointment updated successfully" });
-    } catch (err) {
-      console.error(err);
-      setToast({ type: "error", message: "Failed to update appointment" });
+    } catch (err: any) {
+      setToast({ type: "error", message: err.response?.data.error });
     } finally {
       setIsSaveLoading(false);
     }
   };
 
   // Delete handlers
-  const onDeleteClick = (row: Appointment) => {
+  const onDeleteClick = (row: AppointmentViewModel) => {
     setDeletingAppointmentId(row.id);
     setIsDeleteDialogOpen(true);
   };

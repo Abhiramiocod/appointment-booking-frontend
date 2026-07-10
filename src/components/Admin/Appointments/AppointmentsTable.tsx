@@ -3,43 +3,13 @@ import { Colors } from "../../../lib/utils";
 import StatusBadge from "./StatusBadge";
 import AppointmentDropdown from "./AppointmentDropdown";
 
-interface RawAppointment {
-  id?: number;
-  customer?: { id?: number; name?: string };
-  staff?: { id?: number; name?: string };
-  service?: { id?: number; name?: string; duration?: number; price?: string };
-  appointment_date?: string;
-  start_time?: string;
-  end_time?: string;
-  status?: string;
-  notes?: string;
-  created_at?: string;
-  updated_at?: string;
-}
-
-interface Appointment {
-  id: number;
-  initials: string;
-  name: string;
-  email: string;
-  service: string;
-  staff: string;
-  date: string;
-  time: string;
-  status: string;
-  customerSince: string;
-  serviceType: string;
-  duration: string;
-  notes: string;
-  history: { date: string; detail: string; current: boolean }[];
-  rawData: RawAppointment;
-}
+import type { AppointmentViewModel } from "../../../types/Admin/Appointments/appointments";
 
 interface AppointmentsTableProps {
-  rows: Appointment[];
-  onRowClick: (row: Appointment) => void;
-  onEdit: (row: Appointment) => void;
-  onDelete: (row: Appointment) => void;
+  rows: AppointmentViewModel[];
+  onRowClick: (row: AppointmentViewModel) => void;
+  onEdit: (row: AppointmentViewModel) => void;
+  onDelete: (row: AppointmentViewModel) => void;
 }
 
 export default function AppointmentsTable({ rows, onRowClick, onEdit, onDelete }: AppointmentsTableProps) {
@@ -109,13 +79,13 @@ export default function AppointmentsTable({ rows, onRowClick, onEdit, onDelete }
                         className="font-bold"
                         style={{ color: Colors.onSurface }}
                       >
-                        {row.name}
+                        {row.customerName}
                       </div>
                       <div
                         className="text-sm"
                         style={{ color: Colors.onSurfaceVariant }}
                       >
-                        {row.email}
+                        {row.customerEmail}
                       </div>
                     </div>
                   </div>
@@ -125,7 +95,7 @@ export default function AppointmentsTable({ rows, onRowClick, onEdit, onDelete }
                     className="font-medium"
                     style={{ color: Colors.onSurface }}
                   >
-                    {row.service}
+                    {row.serviceName}
                   </span>
                 </td>
                 <td className="px-6 py-5">
@@ -135,7 +105,7 @@ export default function AppointmentsTable({ rows, onRowClick, onEdit, onDelete }
                       style={{ backgroundColor: Colors.secondaryContainer }}
                     />
                     <span style={{ color: Colors.onSurfaceVariant }}>
-                      {row.staff}
+                      {row.staffName}
                     </span>
                   </div>
                 </td>
@@ -144,13 +114,13 @@ export default function AppointmentsTable({ rows, onRowClick, onEdit, onDelete }
                     className="font-medium"
                     style={{ color: Colors.onSurface }}
                   >
-                    {row.date}
+                    {row.formattedDate}
                   </div>
                   <div
                     className="text-sm"
                     style={{ color: Colors.onSurfaceVariant }}
                   >
-                    {row.time}
+                    {row.formattedTime}
                   </div>
                 </td>
                 <td className="px-6 py-5">

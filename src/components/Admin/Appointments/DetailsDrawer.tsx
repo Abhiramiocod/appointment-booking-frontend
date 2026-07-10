@@ -1,9 +1,15 @@
 import { History, NotebookText, Trash2, X } from "lucide-react";
 import { Colors, statusStyles } from "../../../lib/utils";
+import type { AppointmentViewModel } from "../../../types/Admin/Appointments/appointments";
 
-export default function DetailsDrawer({ appointment, onClose }) {
+interface DetailsDrawerProps {
+  appointment: AppointmentViewModel | null;
+  onClose: () => void;
+}
+
+export default function DetailsDrawer({ appointment, onClose }: DetailsDrawerProps) {
   if (!appointment) return null;
-  const s = statusStyles[appointment.status] || statusStyles.Confirmed;
+  const s = statusStyles[appointment.status as keyof typeof statusStyles] || statusStyles.Confirmed;
 
   return (
     <div
@@ -64,10 +70,10 @@ export default function DetailsDrawer({ appointment, onClose }) {
                 className="text-xl font-bold"
                 style={{ color: Colors.onSurface }}
               >
-                {appointment.name}
+                {appointment.customerName}
               </h4>
               <p style={{ color: Colors.onSurfaceVariant }}>
-                Customer since {appointment.customerSince}
+                Customer since {new Date(appointment.dto.created_at || Date.now()).toLocaleDateString("en-US", { year: "numeric", month: "long" })}
               </p>
             </div>
             <span
@@ -90,7 +96,7 @@ export default function DetailsDrawer({ appointment, onClose }) {
                 Service Type
               </label>
               <span className="font-medium" style={{ color: Colors.onSurface }}>
-                {appointment.serviceType}
+                {appointment.serviceName}
               </span>
             </div>
             <div
@@ -125,7 +131,7 @@ export default function DetailsDrawer({ appointment, onClose }) {
                   backgroundColor: Colors.surfaceContainerLow,
                 }}
               >
-                "{appointment.notes}"
+                "{appointment.dto.notes || ""}"
               </p>
             </div>
 
