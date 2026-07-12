@@ -6,7 +6,7 @@ import Login from "./pages/Login";
 import AdminLayout from "./layouts/AdminLayout";
 import AdminDashboard from "./pages/Admin/Dashboard";
 import AdminAppointments from "./pages/Admin/Appointments";
-import AdminSchedule from "./pages/Admin/Schedule";
+import AdminStaff from "./pages/Admin/Staffs";
 import AdminClients from "./pages/Admin/Clients";
 import AdminAnalytics from "./pages/Admin/Analytics";
 import AdminSettings from "./pages/Admin/Settings";
@@ -27,7 +27,7 @@ export default function App() {
       <Route path="/admin" element={<AdminLayout />}>
         <Route index element={<AdminDashboard />} />
         <Route path="appointments" element={<AdminAppointments />} />
-        <Route path="schedule" element={<AdminSchedule />} />
+        <Route path="staff" element={<AdminStaff />} />
         <Route path="clients" element={<AdminClients />} />
         <Route path="analytics" element={<AdminAnalytics />} />
         <Route path="settings" element={<AdminSettings />} />

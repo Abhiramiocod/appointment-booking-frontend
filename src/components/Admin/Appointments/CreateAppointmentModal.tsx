@@ -4,8 +4,13 @@ import {
   DialogBackdrop,
   DialogPanel,
   DialogTitle,
+  Combobox,
+  ComboboxInput,
+  ComboboxButton,
+  ComboboxOptions,
+  ComboboxOption,
 } from "@headlessui/react";
-import { X } from "lucide-react";
+import { X, ChevronDown } from "lucide-react";
 import api from "../../../lib/api";
 import { Colors } from "../../../lib/utils";
 import Toast from "../../Toast";
@@ -23,8 +28,13 @@ interface Staff {
 interface Service {
   id: number;
   name: string;
-  duration?: number;
   price?: string;
+}
+
+interface Customer {
+  id: number;
+  name: string;
+  email: string;
 }
 
 export default function CreateAppointmentModal({
@@ -47,6 +57,27 @@ export default function CreateAppointmentModal({
     type: "success" | "error";
     message: string;
   } | null>(null);
+
+  // Customer search states
+  const [searchQuery, setSearchQuery] = useState("");
+  const [customerResults, setCustomerResults] = useState<Customer[]>([]);
+  const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
+  const [isSearchingCustomer, setIsSearchingCustomer] = useState(false);
+  const [showCustomerDropdown, setShowCustomerDropdown] = useState(false);
+
+  // Staff combobox states
+  const [staffSearchQuery, setStaffSearchQuery] = useState("");
+  const [selectedStaff, setSelectedStaff] = useState<Staff | null>(null);
+  const [showStaffDropdown, setShowStaffDropdown] = useState(false);
+
+  // Service combobox states
+  const [serviceSearchQuery, setServiceSearchQuery] = useState("");
+  const [selectedService, setSelectedService] = useState<Service | null>(null);
+  const [showServiceDropdown, setShowServiceDropdown] = useState(false);
+
+  // Status combobox states
+  const [statusSearchQuery, setStatusSearchQuery] = useState("Confirmed");
+  const [showStatusDropdown, setShowStatusDropdown] = useState(false);
 
   // Fetch staff and services on open
   useEffect(() => {
@@ -79,15 +110,61 @@ export default function CreateAppointmentModal({
 
       // Reset form states
       setCustomerId("");
+      setSearchQuery("");
+      setCustomerResults([]);
+      setSelectedCustomer(null);
+      setShowCustomerDropdown(false);
+
       setStaffId("");
+      setStaffSearchQuery("");
+      setSelectedStaff(null);
+      setShowStaffDropdown(false);
+
       setServiceId("");
+      setServiceSearchQuery("");
+      setSelectedService(null);
+      setShowServiceDropdown(false);
+
       setAppointmentDate("");
       setStartTime("");
       setEndTime("");
+      
       setStatus("confirmed");
+      setStatusSearchQuery("Confirmed");
+      setShowStatusDropdown(false);
+
       setNotes("");
     }
   }, [isOpen]);
+
+  // Search customers with debounce
+  useEffect(() => {
+    if (!isOpen) return;
+    if (selectedCustomer && searchQuery === `${selectedCustomer.name} (${selectedCustomer.email})`) {
+      return;
+    }
+    if (!searchQuery.trim()) {
+      setCustomerResults([]);
+      return;
+    }
+
+    const delayDebounceFn = setTimeout(async () => {
+      setIsSearchingCustomer(true);
+      try {
+        const response = await api.get("/admin/customers", {
+          params: { search: searchQuery },
+        });
+        const data = response.data.data ?? response.data ?? [];
+        setCustomerResults(Array.isArray(data) ? data.slice(0, 5) : []);
+      } catch (err) {
+        console.error("Failed to search customers:", err);
+      } finally {
+        setIsSearchingCustomer(false);
+      }
+    }, 300);
+
+    return () => clearTimeout(delayDebounceFn);
+  }, [searchQuery, isOpen, selectedCustomer]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -138,6 +215,26 @@ export default function CreateAppointmentModal({
     }
   };
 
+  // Local filtering for Staff, Service, and Status
+  const filteredStaffList = staffList.filter((staff) =>
+    staff.name.toLowerCase().includes(staffSearchQuery.toLowerCase())
+  );
+
+  const filteredServiceList = serviceList.filter((service) =>
+    service.name.toLowerCase().includes(serviceSearchQuery.toLowerCase())
+  );
+
+  const statuses = [
+    { value: "pending", label: "Pending" },
+    { value: "confirmed", label: "Confirmed" },
+    { value: "completed", label: "Completed" },
+    { value: "cancelled", label: "Cancelled" },
+  ];
+  
+  const filteredStatusList = statuses.filter((st) =>
+    st.label.toLowerCase().includes(statusSearchQuery.toLowerCase())
+  );
+
   return (
     <>
       <Dialog open={isOpen} onClose={onClose} className="relative z-[9999]">
@@ -170,78 +267,249 @@ export default function CreateAppointmentModal({
 
             <form onSubmit={handleSubmit} className="space-y-4">
               {/* Customer ID */}
-              <div>
+              <div className="relative">
                 <label
-                  htmlFor="customer"
                   style={{ color: Colors.onSurfaceVariant }}
                   className="mb-2 block text-xs font-semibold uppercase tracking-wider"
                 >
-                  Customer ID *
+                  Customer *
                 </label>
-                <input
-                  id="customer"
-                  type="number"
-                  placeholder="Enter Customer User ID (e.g. 3)"
+                <Combobox
                   value={customerId}
-                  onChange={(e) => setCustomerId(e.target.value)}
-                  className="w-full rounded-xl border-none bg-gray-50 px-4 py-3 outline-none"
-                  style={{ color: Colors.onSurface }}
-                  required
-                />
+                  onChange={(val) => {
+                    const found = customerResults.find(c => c.id.toString() === val);
+                    if (found) {
+                      setSelectedCustomer(found);
+                      setCustomerId(found.id.toString());
+                      setSearchQuery(`${found.name} (${found.email})`);
+                    }
+                  }}
+                >
+                  <div className="relative">
+                    <ComboboxInput
+                      className="w-full rounded-xl border-none bg-gray-50 px-4 py-3 outline-none pr-20"
+                      style={{ color: Colors.onSurface }}
+                      displayValue={() => selectedCustomer ? `${selectedCustomer.name} (${selectedCustomer.email})` : searchQuery}
+                      onChange={(e) => {
+                        setSearchQuery(e.target.value);
+                        if (selectedCustomer && e.target.value !== `${selectedCustomer.name} (${selectedCustomer.email})`) {
+                          setSelectedCustomer(null);
+                          setCustomerId("");
+                        }
+                      }}
+                      placeholder="Search by customer name or email..."
+                      autoComplete="off"
+                      required={!customerId}
+                    />
+                    <ComboboxButton className="absolute inset-y-0 right-0 flex items-center pr-3">
+                      {isSearchingCustomer ? (
+                        <div className="animate-spin h-4 w-4 border-2 border-purple-500 border-t-transparent rounded-full" />
+                      ) : (
+                        <ChevronDown size={18} style={{ color: Colors.onSurfaceVariant }} />
+                      )}
+                    </ComboboxButton>
+                    {selectedCustomer && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setSelectedCustomer(null);
+                          setCustomerId("");
+                          setSearchQuery("");
+                          setCustomerResults([]);
+                        }}
+                        className="absolute right-10 top-1/2 -translate-y-1/2 text-xs font-bold px-2 py-1 rounded hover:bg-gray-200"
+                        style={{ color: Colors.primary }}
+                      >
+                        Clear
+                      </button>
+                    )}
+
+                    <ComboboxOptions className="absolute left-0 right-0 mt-1 max-h-60 overflow-y-auto rounded-xl bg-white border border-gray-100 shadow-lg z-[99999] py-1">
+                      {isSearchingCustomer ? (
+                        <div className="px-4 py-3 text-sm text-gray-500">Searching...</div>
+                      ) : customerResults.length > 0 ? (
+                        customerResults.map((customer) => (
+                          <ComboboxOption
+                            key={customer.id}
+                            value={customer.id.toString()}
+                            className={({ active, selected }) =>
+                              `relative cursor-pointer select-none py-2.5 px-4 ${
+                                active ? "bg-purple-50" : ""
+                              } ${selected ? "font-bold text-purple-700" : ""}`
+                            }
+                          >
+                            <div className="flex flex-col text-left">
+                              <span className="font-semibold text-sm" style={{ color: Colors.onSurface }}>
+                                {customer.name}
+                              </span>
+                              <span className="text-xs text-gray-500">
+                                {customer.email} (ID: {customer.id})
+                              </span>
+                            </div>
+                          </ComboboxOption>
+                        ))
+                      ) : (
+                        <div className="px-4 py-3 text-sm text-gray-500">No customers found</div>
+                      )}
+                    </ComboboxOptions>
+                  </div>
+                </Combobox>
               </div>
 
               {/* Staff and Service row */}
               <div className="grid grid-cols-2 gap-4">
                 {/* Staff Select */}
-                <div>
+                <div className="relative">
                   <label
-                    htmlFor="staff"
                     style={{ color: Colors.onSurfaceVariant }}
                     className="block text-xs font-semibold uppercase tracking-wider mb-2"
                   >
                     Staff *
                   </label>
-                  <select
-                    id="staff"
+                  <Combobox
                     value={staffId}
-                    onChange={(e) => setStaffId(e.target.value)}
-                    className="w-full rounded-xl border-none bg-gray-50 px-4 py-3 outline-none"
-                    style={{ color: Colors.onSurface }}
-                    required
+                    onChange={(val) => {
+                      const found = staffList.find(s => s.id.toString() === val);
+                      if (found) {
+                        setSelectedStaff(found);
+                        setStaffId(found.id.toString());
+                        setStaffSearchQuery(found.name);
+                      }
+                    }}
                   >
-                    <option value="">Select Staff</option>
-                    {staffList.map((staff) => (
-                      <option key={staff.id} value={staff.id}>
-                        {staff.name}
-                      </option>
-                    ))}
-                  </select>
+                    <div className="relative">
+                      <ComboboxInput
+                        className="w-full rounded-xl border-none bg-gray-50 px-4 py-3 outline-none pr-16"
+                        style={{ color: Colors.onSurface }}
+                        displayValue={() => selectedStaff ? selectedStaff.name : staffSearchQuery}
+                        onChange={(e) => {
+                          setStaffSearchQuery(e.target.value);
+                          if (selectedStaff && e.target.value !== selectedStaff.name) {
+                            setSelectedStaff(null);
+                            setStaffId("");
+                          }
+                        }}
+                        placeholder="Search Staff..."
+                        autoComplete="off"
+                        required={!staffId}
+                      />
+                      <ComboboxButton className="absolute inset-y-0 right-0 flex items-center pr-3">
+                        <ChevronDown size={18} style={{ color: Colors.onSurfaceVariant }} />
+                      </ComboboxButton>
+                      {selectedStaff && (
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setSelectedStaff(null);
+                            setStaffId("");
+                            setStaffSearchQuery("");
+                          }}
+                          className="absolute right-10 top-1/2 -translate-y-1/2 text-xs font-bold px-2 py-1 rounded hover:bg-gray-200"
+                          style={{ color: Colors.primary }}
+                        >
+                          Clear
+                        </button>
+                      )}
+
+                      <ComboboxOptions className="absolute left-0 right-0 mt-1 max-h-40 overflow-y-auto rounded-xl bg-white border border-gray-100 shadow-lg z-[9999] py-1">
+                        {filteredStaffList.length > 0 ? (
+                          filteredStaffList.map((staff) => (
+                            <ComboboxOption
+                              key={staff.id}
+                              value={staff.id.toString()}
+                              className={({ active, selected }) =>
+                                `relative cursor-pointer select-none py-2 px-4 ${
+                                  active ? "bg-purple-50" : ""
+                                } ${selected ? "font-bold text-purple-700" : ""}`
+                              }
+                            >
+                              <span style={{ color: Colors.onSurface }}>{staff.name}</span>
+                            </ComboboxOption>
+                          ))
+                        ) : (
+                          <div className="px-4 py-2 text-sm text-gray-500">No staff found</div>
+                        )}
+                      </ComboboxOptions>
+                    </div>
+                  </Combobox>
                 </div>
 
                 {/* Service Select */}
-                <div>
+                <div className="relative">
                   <label
-                    htmlFor="service"
                     style={{ color: Colors.onSurfaceVariant }}
                     className="block text-xs font-semibold uppercase tracking-wider mb-2"
                   >
                     Service *
                   </label>
-                  <select
-                    id="service"
+                  <Combobox
                     value={serviceId}
-                    onChange={(e) => setServiceId(e.target.value)}
-                    className="w-full rounded-xl border-none bg-gray-50 px-4 py-3 outline-none"
-                    style={{ color: Colors.onSurface }}
-                    required
+                    onChange={(val) => {
+                      const found = serviceList.find(s => s.id.toString() === val);
+                      if (found) {
+                        setSelectedService(found);
+                        setServiceId(found.id.toString());
+                        setServiceSearchQuery(`${found.name}`);
+                      }
+                    }}
                   >
-                    <option value="">Select Service</option>
-                    {serviceList.map((service) => (
-                      <option key={service.id} value={service.id}>
-                        {service.name} {service.duration ? `(${service.duration} mins)` : ""}
-                      </option>
-                    ))}
-                  </select>
+                    <div className="relative">
+                      <ComboboxInput
+                        className="w-full rounded-xl border-none bg-gray-50 px-4 py-3 outline-none pr-16"
+                        style={{ color: Colors.onSurface }}
+                        displayValue={() => selectedService ? `${selectedService.name}` : serviceSearchQuery}
+                        onChange={(e) => {
+                          setServiceSearchQuery(e.target.value);
+                          if (selectedService && e.target.value !== `${selectedService.name}`) {
+                            setSelectedService(null);
+                            setServiceId("");
+                          }
+                        }}
+                        placeholder="Search Service..."
+                        autoComplete="off"
+                        required={!serviceId}
+                      />
+                      <ComboboxButton className="absolute inset-y-0 right-0 flex items-center pr-3">
+                        <ChevronDown size={18} style={{ color: Colors.onSurfaceVariant }} />
+                      </ComboboxButton>
+                      {selectedService && (
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setSelectedService(null);
+                            setServiceId("");
+                            setServiceSearchQuery("");
+                          }}
+                          className="absolute right-10 top-1/2 -translate-y-1/2 text-xs font-bold px-2 py-1 rounded hover:bg-gray-200"
+                          style={{ color: Colors.primary }}
+                        >
+                          Clear
+                        </button>
+                      )}
+
+                      <ComboboxOptions className="absolute left-0 right-0 mt-1 max-h-40 overflow-y-auto rounded-xl bg-white border border-gray-100 shadow-lg z-[9999] py-1">
+                        {filteredServiceList.length > 0 ? (
+                          filteredServiceList.map((service) => (
+                            <ComboboxOption
+                              key={service.id}
+                              value={service.id.toString()}
+                              className={({ active, selected }) =>
+                                `relative cursor-pointer select-none py-2 px-4 ${
+                                  active ? "bg-purple-50" : ""
+                                } ${selected ? "font-bold text-purple-700" : ""}`
+                              }
+                            >
+                              <span style={{ color: Colors.onSurface }}>
+                                {service.name}
+                              </span>
+                            </ComboboxOption>
+                          ))
+                        ) : (
+                          <div className="px-4 py-2 text-sm text-gray-500">No services found</div>
+                        )}
+                      </ComboboxOptions>
+                    </div>
+                  </Combobox>
                 </div>
               </div>
 
@@ -308,27 +576,82 @@ export default function CreateAppointmentModal({
               </div>
 
               {/* Status */}
-              <div>
+              <div className="relative">
                 <label
-                  htmlFor="status"
                   style={{ color: Colors.onSurfaceVariant }}
                   className="block text-xs font-semibold uppercase tracking-wider mb-2"
                 >
                   Status *
                 </label>
-                <select
-                  id="status"
+                <Combobox
                   value={status}
-                  onChange={(e) => setStatus(e.target.value)}
-                  className="w-full rounded-xl border-none bg-gray-50 px-4 py-3 outline-none"
-                  style={{ color: Colors.onSurface }}
-                  required
+                  onChange={(val) => {
+                    const found = statuses.find(st => st.value === val);
+                    if (found) {
+                      setStatus(found.value);
+                      setStatusSearchQuery(found.label);
+                    }
+                  }}
                 >
-                  <option value="pending">Pending</option>
-                  <option value="confirmed">Confirmed</option>
-                  <option value="completed">Completed</option>
-                  <option value="cancelled">Cancelled</option>
-                </select>
+                  <div className="relative">
+                    <ComboboxInput
+                      className="w-full rounded-xl border-none bg-gray-50 px-4 py-3 outline-none pr-16"
+                      style={{ color: Colors.onSurface }}
+                      displayValue={() => {
+                        const option = statuses.find((opt) => opt.value === status);
+                        return option ? option.label : statusSearchQuery;
+                      }}
+                      onChange={(e) => {
+                        setStatusSearchQuery(e.target.value);
+                        const matched = statuses.find(st => st.label.toLowerCase() === e.target.value.toLowerCase());
+                        if (matched) {
+                          setStatus(matched.value);
+                        } else {
+                          setStatus("");
+                        }
+                      }}
+                      placeholder="Search Status..."
+                      autoComplete="off"
+                      required={!status}
+                    />
+                    <ComboboxButton className="absolute inset-y-0 right-0 flex items-center pr-3">
+                      <ChevronDown size={18} style={{ color: Colors.onSurfaceVariant }} />
+                    </ComboboxButton>
+                    {status && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setStatus("");
+                          setStatusSearchQuery("");
+                        }}
+                        className="absolute right-10 top-1/2 -translate-y-1/2 text-xs font-bold px-2 py-1 rounded hover:bg-gray-200"
+                        style={{ color: Colors.primary }}
+                      >
+                        Clear
+                      </button>
+                    )}
+
+                    <ComboboxOptions className="absolute left-0 right-0 mt-1 max-h-40 overflow-y-auto rounded-xl bg-white border border-gray-100 shadow-lg z-[9999] py-1">
+                      {filteredStatusList.length > 0 ? (
+                        filteredStatusList.map((st) => (
+                          <ComboboxOption
+                            key={st.value}
+                            value={st.value}
+                            className={({ active, selected }) =>
+                              `relative cursor-pointer select-none py-2 px-4 ${
+                                active ? "bg-purple-50" : ""
+                              } ${selected ? "font-bold text-purple-700" : ""}`
+                            }
+                          >
+                            <span style={{ color: Colors.onSurface }}>{st.label}</span>
+                          </ComboboxOption>
+                        ))
+                      ) : (
+                        <div className="px-4 py-2 text-sm text-gray-500">No status found</div>
+                      )}
+                    </ComboboxOptions>
+                  </div>
+                </Combobox>
               </div>
 
               {/* Notes */}
