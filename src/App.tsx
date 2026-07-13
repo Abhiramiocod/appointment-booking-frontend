@@ -6,7 +6,8 @@ import Login from "./pages/Login";
 import AdminLayout from "./layouts/AdminLayout";
 import AdminDashboard from "./pages/Admin/Dashboard";
 import AdminAppointments from "./pages/Admin/Appointments";
-import AdminStaff from "./pages/Admin/Staffs";
+import AdminStaff from "./pages/Admin/Staff/StaffsList";
+import AdminStaffRequests from "./pages/Admin/Staff/StaffRequests";
 import AdminClients from "./pages/Admin/Clients";
 import AdminAnalytics from "./pages/Admin/Analytics";
 import AdminSettings from "./pages/Admin/Settings";
@@ -26,8 +27,14 @@ export default function App() {
       {/* Admin Routes with Nested Layout */}
       <Route path="/admin" element={<AdminLayout />}>
         <Route index element={<AdminDashboard />} />
+
         <Route path="appointments" element={<AdminAppointments />} />
-        <Route path="staff" element={<AdminStaff />} />
+
+        <Route path="staff">
+          <Route index element={<AdminStaff />} />
+          <Route path="requests" element={<AdminStaffRequests />} />
+        </Route>
+
         <Route path="clients" element={<AdminClients />} />
         <Route path="analytics" element={<AdminAnalytics />} />
         <Route path="settings" element={<AdminSettings />} />

@@ -46,6 +46,8 @@ export const Colors = {
   secondaryContainer: "#dae2fd",
   error: "#ba1a1a",
   outline: "#767586",
+  errorContainer: "#ffdad6",
+  onErrorContainer: "#93000a",
 };
 
 export const statusStyles = {

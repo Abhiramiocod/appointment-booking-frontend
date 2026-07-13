@@ -1,5 +1,5 @@
 import { ChevronDown, Star } from "lucide-react";
-import { Colors } from "../../../lib/utils";
+import { Colors } from "../../../../lib/utils";
 import StatusBadge from "./StatusBadge";
 
 interface MainTableProps {
@@ -34,6 +34,12 @@ export default function MainTable({ staffMembers }: MainTableProps) {
               >
                 Status
               </th>
+              <th
+                className="px-4 py-3 text-[11px] font-bold uppercase tracking-wide"
+                style={{ color: Colors.outline }}
+              >
+                Experience
+              </th>
               {/* <th
                 className="px-4 py-3 text-[11px] font-bold uppercase tracking-wide"
                 style={{ color: Colors.outline }}
@@ -53,7 +59,7 @@ export default function MainTable({ staffMembers }: MainTableProps) {
           <tbody>
             {staffMembers.map((s) => (
               <tr
-                key={s.name}
+                key={s.id || s.name}
                 className="hover:bg-[#4646d4]/5 transition-colors border-b last:border-b-0"
                 style={{
                   borderColor: "rgba(199,196,215,0.15)",
@@ -61,12 +67,18 @@ export default function MainTable({ staffMembers }: MainTableProps) {
               >
                 <td className="px-4 py-3">
                   <div className="flex items-center gap-2.5">
-                    <div className="w-8 h-8 rounded-full overflow-hidden">
-                      <img
-                        className="w-full h-full object-cover"
-                        src={s.avatar}
-                        alt={s.name}
-                      />
+                    <div className="w-8 h-8 rounded-full overflow-hidden bg-slate-100 flex items-center justify-center">
+                      {s.profile?.profile_photo || s.avatar ? (
+                        <img
+                          className="w-full h-full object-cover object-top"
+                          src={s.profile?.profile_photo || s.avatar}
+                          alt={s.name}
+                        />
+                      ) : (
+                        <span className="text-xs font-semibold text-slate-400">
+                          {s.name ? s.name.charAt(0).toUpperCase() : ""}
+                        </span>
+                      )}
                     </div>
 
                     <div>
@@ -77,7 +89,7 @@ export default function MainTable({ staffMembers }: MainTableProps) {
                         {s.name}
                       </p>
                       <p
-                        className="text-[12px] leading-tight"
+                        className="text-[12px] leading-tight capitalize"
                         style={{ color: Colors.outline }}
                       >
                         {s.role}
@@ -87,7 +99,18 @@ export default function MainTable({ staffMembers }: MainTableProps) {
                 </td>
 
                 <td className="px-4 py-3">
-                  <StatusBadge status={s.status} />
+                  <StatusBadge
+                    status={s.profile?.employment_status || s.status}
+                  />
+                </td>
+
+                <td className="px-4 py-3">
+                  <span className="text-sm font-medium text-slate-700">
+                    {s.profile?.experience_years !== undefined &&
+                    s.profile?.experience_years !== null
+                      ? `${s.profile.experience_years} yrs`
+                      : "—"}
+                  </span>
                 </td>
 
                 {/* <td className="px-4 py-3">

@@ -1,5 +1,5 @@
 import { Download, UserPlus } from "lucide-react";
-import { Colors } from "../../../lib/utils";
+import { Colors } from "../../../../lib/utils";
 
 export default function HeaderAndButtons() {
   return (

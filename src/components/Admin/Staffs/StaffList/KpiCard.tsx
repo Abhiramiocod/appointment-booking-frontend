@@ -1,4 +1,4 @@
-import { Colors } from "../../../lib/utils";
+import { Colors } from "../../../../lib/utils";
 
 interface KpiCardProps {
   icon: React.ReactNode;

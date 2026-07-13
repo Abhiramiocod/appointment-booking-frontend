@@ -1,5 +1,5 @@
 import { Lightbulb, Sparkles } from "lucide-react";
-import { Colors } from "../../../lib/utils";
+import { Colors } from "../../../../lib/utils";
 
 interface TopPerformers {
   name: string;

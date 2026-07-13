@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
 import { Star, IdCard, Circle } from "lucide-react";
-import HeaderAndButtons from "../../components/Admin/Staffs/HeaderAndButtons";
-import KpiCard from "../../components/Admin/Staffs/KpiCard";
-import MainTable from "../../components/Admin/Staffs/MainTable";
-import SidebarPerformanceInsights from "../../components/Admin/Staffs/SidebarPerformanceInsights";
-import { Colors } from "../../lib/utils";
-import api from "../../lib/api";
+import HeaderAndButtons from "../../../components/Admin/Staffs/StaffList/HeaderAndButtons";
+import KpiCard from "../../../components/Admin/Staffs/StaffList/KpiCard";
+import MainTable from "../../../components/Admin/Staffs/StaffList/MainTable";
+import SidebarPerformanceInsights from "../../../components/Admin/Staffs/StaffList/SidebarPerformanceInsights";
+import { Colors } from "../../../lib/utils";
+import api from "../../../lib/api";
 
 // ---- Mock data ----
 const staffMembers = [
@@ -79,7 +79,7 @@ const topPerformers = [
 
 const filters = ["All Staff", "Aestheticians", "Therapists", "Reception"];
 
-export default function Staff() {
+export default function StaffsList() {
   const [activeFilter, setActiveFilter] = useState("All Staff");
   const [sortBy, setSortBy] = useState("Performance");
 
