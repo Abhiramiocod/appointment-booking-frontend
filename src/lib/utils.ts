@@ -45,6 +45,7 @@ export const Colors = {
   surfaceContainerHighest: "#e4e1ed",
   secondaryContainer: "#dae2fd",
   error: "#ba1a1a",
+  outline: "#767586",
 };
 
 export const statusStyles = {

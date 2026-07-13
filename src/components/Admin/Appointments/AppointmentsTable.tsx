@@ -16,7 +16,7 @@ export default function AppointmentsTable({ rows, onRowClick, onEdit, onDelete }
   const headers = ["Customer", "Service", "Staff", "Date & Time", "Status", ""];
   return (
     <div
-      className="rounded-2xl overflow-hidden shadow-sm border"
+      className="rounded-xl overflow-hidden shadow-sm border"
       style={{
         backgroundColor: "rgba(255,255,255,0.7)",
         backdropFilter: "blur(24px)",
@@ -35,7 +35,7 @@ export default function AppointmentsTable({ rows, onRowClick, onEdit, onDelete }
               {headers.map((h, i) => (
                 <th
                   key={i}
-                  className={`px-6 py-4 text-xs font-semibold uppercase tracking-wider ${
+                  className={`px-4 py-3 text-[11px] font-bold uppercase tracking-wide ${
                     i === headers.length - 1 ? "text-right" : ""
                   }`}
                   style={{ color: Colors.onSurfaceVariant }}
@@ -63,10 +63,10 @@ export default function AppointmentsTable({ rows, onRowClick, onEdit, onDelete }
                   (e.currentTarget.style.backgroundColor = "transparent")
                 }
               >
-                <td className="px-6 py-5">
-                  <div className="flex items-center gap-3">
+                <td className="px-4 py-3">
+                  <div className="flex items-center gap-2.5">
                     <div
-                      className="w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm"
+                      className="w-8 h-8 rounded-full flex items-center justify-center font-bold text-xs shrink-0"
                       style={{
                         backgroundColor: "rgba(96,99,238,0.12)",
                         color: Colors.primary,
@@ -76,13 +76,13 @@ export default function AppointmentsTable({ rows, onRowClick, onEdit, onDelete }
                     </div>
                     <div>
                       <div
-                        className="font-bold"
+                        className="font-semibold text-sm leading-tight"
                         style={{ color: Colors.onSurface }}
                       >
                         {row.customerName}
                       </div>
                       <div
-                        className="text-sm"
+                        className="text-[12px] leading-tight"
                         style={{ color: Colors.onSurfaceVariant }}
                       >
                         {row.customerEmail}
@@ -90,43 +90,43 @@ export default function AppointmentsTable({ rows, onRowClick, onEdit, onDelete }
                     </div>
                   </div>
                 </td>
-                <td className="px-6 py-5">
+                <td className="px-4 py-3">
                   <span
-                    className="font-medium"
+                    className="font-medium text-sm"
                     style={{ color: Colors.onSurface }}
                   >
                     {row.serviceName}
                   </span>
                 </td>
-                <td className="px-6 py-5">
+                <td className="px-4 py-3">
                   <div className="flex items-center gap-2">
                     <div
-                      className="w-6 h-6 rounded-full"
+                      className="w-5 h-5 rounded-full shrink-0"
                       style={{ backgroundColor: Colors.secondaryContainer }}
                     />
-                    <span style={{ color: Colors.onSurfaceVariant }}>
+                    <span className="text-sm" style={{ color: Colors.onSurfaceVariant }}>
                       {row.staffName}
                     </span>
                   </div>
                 </td>
-                <td className="px-6 py-5">
+                <td className="px-4 py-3">
                   <div
-                    className="font-medium"
+                    className="font-medium text-sm"
                     style={{ color: Colors.onSurface }}
                   >
                     {row.formattedDate}
                   </div>
                   <div
-                    className="text-sm"
+                    className="text-[12px]"
                     style={{ color: Colors.onSurfaceVariant }}
                   >
                     {row.formattedTime}
                   </div>
                 </td>
-                <td className="px-6 py-5">
+                <td className="px-4 py-3">
                   <StatusBadge status={row.status} />
                 </td>
-                <td className="px-6 py-5 text-right">
+                <td className="px-4 py-3 text-right">
                   <div onClick={(e) => e.stopPropagation()}>
                     <AppointmentDropdown
                       onEdit={() => onEdit(row)}
@@ -141,31 +141,31 @@ export default function AppointmentsTable({ rows, onRowClick, onEdit, onDelete }
       </div>
 
       <div
-        className="p-6 flex items-center justify-between"
+        className="p-4 flex items-center justify-between"
         style={{ backgroundColor: Colors.surfaceContainerLow }}
       >
-        <span className="text-sm" style={{ color: Colors.onSurfaceVariant }}>
+        <span className="text-xs" style={{ color: Colors.onSurfaceVariant }}>
           Showing 1-{rows.length} of 124 appointments
         </span>
         <div className="flex gap-2">
           <button
             disabled
-            className="p-2 rounded-lg border disabled:opacity-50"
+            className="p-1.5 rounded-lg border disabled:opacity-50"
             style={{
               borderColor: "rgba(199,196,215,0.3)",
               color: Colors.onSurfaceVariant,
             }}
           >
-            <ChevronLeft size={18} />
+            <ChevronLeft size={16} />
           </button>
           <button
-            className="p-2 rounded-lg border transition-all"
+            className="p-1.5 rounded-lg border transition-all"
             style={{
               borderColor: "rgba(199,196,215,0.3)",
               color: Colors.onSurfaceVariant,
             }}
           >
-            <ChevronRight size={18} />
+            <ChevronRight size={16} />
           </button>
         </div>
       </div>

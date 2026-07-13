@@ -104,7 +104,7 @@ export default function Appointments() {
   const searchStaff = async (query: string): Promise<Staff[]> => {
     try {
       const response = await api.get("/admin/staff/search", {
-        params: { search: query }
+        params: { search: query },
       });
       return response.data.data ?? [];
     } catch (err) {
@@ -126,7 +126,7 @@ export default function Appointments() {
   const searchServices = async (query: string): Promise<Service[]> => {
     try {
       const response = await api.get("/admin/services/search", {
-        params: { search: query }
+        params: { search: query },
       });
       return response.data.data ?? [];
     } catch (err) {
@@ -196,12 +196,12 @@ export default function Appointments() {
       const updatedAppointment = response.data.data ?? response.data;
 
       setAppointments((prev) =>
-          prev.map((appt) => {
-            if (appt.id === appointmentId) {
-              return transformAppointment(updatedAppointment, appt.id);
-            }
-            return appt;
-          }),
+        prev.map((appt) => {
+          if (appt.id === appointmentId) {
+            return transformAppointment(updatedAppointment, appt.id);
+          }
+          return appt;
+        }),
       );
       setIsEditModalOpen(false);
       setToast({
@@ -230,7 +230,7 @@ export default function Appointments() {
     try {
       await api.delete(`/admin/appointments/${deletingAppointmentId}`);
       setAppointments((prev) =>
-          prev.filter((appt) => appt.id !== deletingAppointmentId),
+        prev.filter((appt) => appt.id !== deletingAppointmentId),
       );
       setIsDeleteDialogOpen(false);
       setDeletingAppointmentId(null);
@@ -247,33 +247,58 @@ export default function Appointments() {
   };
 
   return (
+    <div
+      style={{
+        padding: "28px 32px",
+        flex: 1,
+        backgroundColor: Colors.background,
+      }}
+    >
       <div
-          style={{
-            padding: "28px 32px",
-            flex: 1,
-            backgroundColor: Colors.background,
-          }}
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "flex-start",
+          marginBottom: 24,
+        }}
       >
-        <FilterBar
-            filters={filters}
-            onFilterChange={(key, value) => {
-              setSearchParams((prev) => {
-                const newParams = new URLSearchParams(prev);
+        <div>
+          <h1
+            style={{
+              fontSize: 24,
+              fontWeight: 700,
+              color: "#1b1b23",
+              margin: 0,
+              letterSpacing: "-0.02em",
+            }}
+          >
+            Appointments
+          </h1>
+          <p style={{ color: "#767586", fontSize: 14, margin: "4px 0 0" }}>
+            Manage your bookings and schedule.
+          </p>
+        </div>
+      </div>
+      <FilterBar
+        filters={filters}
+        onFilterChange={(key, value) => {
+          setSearchParams((prev) => {
+            const newParams = new URLSearchParams(prev);
             if (value) {
-                  newParams.set(key, value);
-                } else {
-                  newParams.delete(key);
-                }
-                return newParams;
-              });
-            }}
-            onReset={() => {
-              setSearchParams({});
-            }}
-            serviceList={serviceList}
-            searchStaff={searchStaff}
-            searchServices={searchServices}
-        />
+              newParams.set(key, value);
+            } else {
+              newParams.delete(key);
+            }
+            return newParams;
+          });
+        }}
+        onReset={() => {
+          setSearchParams({});
+        }}
+        serviceList={serviceList}
+        searchStaff={searchStaff}
+        searchServices={searchServices}
+      />
       {loading ? (
         <div style={{ textAlign: "center", padding: "4rem" }}>Loading...</div>
       ) : (
