@@ -7,45 +7,6 @@ import SidebarPerformanceInsights from "../../../components/Admin/Staffs/StaffLi
 import { Colors } from "../../../lib/utils";
 import api from "../../../lib/api";
 
-// ---- Mock data ----
-const staffMembers = [
-  {
-    name: "Dr. Elena Vance",
-    role: "Senior Aesthetician",
-    avatar:
-      "https://lh3.googleusercontent.com/aida-public/AB6AXuCJmCYPA7N40-Yo4OIyhSg6JcVe7GSAHFvWdOkVCBhfODUP9JpZbVxDVm6yHCObDXIIvS3Zki4SKwY2SZ7rD2LQE050f2EVKwAxtTGfJu7rEQxXlibJ2sSVezEYJNvR9OyLUydwbtosBC0MpouSNpbsTIqdNpQSuP-z2ggAlp6oGkILVMXF5rhFP1oPIdrY3pF0DxdoxpV7pj_y7XtoNHRx9-6vUg8ROcGFj2Hv6aX2oBmY7Ev6reTwnl59c9laC1JFVwrdepcQVIne",
-    status: "Active",
-    rating: 4.9,
-    reviews: 128,
-  },
-  {
-    name: "Julian Thorne",
-    role: "Lead Massage Therapist",
-    avatar:
-      "https://lh3.googleusercontent.com/aida-public/AB6AXuAj-WO78l9SWuM1d71VIFXCXp69Bg8gBhHu59FHENctFGL9gYy4odqHGsyhS6KFESk9grGw8WGZrqGFCRctsZiuRA9tQ_Zy0_z5lE4CCV-dqFp0AE67UxFYwWHWKKOMPB6yFVRqxFGZXaPz4SmXUO94Ihndv_Qx-4Xr25lg_4wnAZboiuynFWUzOM0sI2w60XVfSlgtiRcLE0h-Q1BO0W9hj6OTa6IMzKbm0zmxG5XgHONu5_EDTYdL3sYIfWv3VBUypKeQj_YGD-fK",
-    status: "On Break",
-    rating: 4.7,
-    reviews: 94,
-  },
-  {
-    name: "Sophie Chen",
-    role: "Dermatology Nurse",
-    avatar:
-      "https://lh3.googleusercontent.com/aida-public/AB6AXuAm03WJ6W3K-A4b5Alj7pyT9F7rZuvtaQ4DTAic4pYjFn0mgJ8rvkoCkFiTzNEjcY-O-bl2FvQwpbc5_vuXct4J2dnLZt1ID9sdRVIXO_3IYrxzAWJT6bh1btzkahHBRO1P7oD39vvb757Ck3kDqrvqHcsS3BLngch9q7o6u3eH75oWHzsTC0QY_7BiJTeHl5SFRKWd3UG1OOZeZymkbY9tHGHaZ-zuBYqTgSHFiGoOWtBSYoaolCclWzQzocz7SjGq-bQL3ZIAIn_i",
-    status: "Offline",
-    rating: 5.0,
-    reviews: 210,
-  },
-  {
-    name: "Marcus Reed",
-    role: "Medical Director",
-    avatar:
-      "https://lh3.googleusercontent.com/aida-public/AB6AXuCASSGbBaH1FDRwI2qdCQP-ep_t1em9z8FIc2SL41_k6hzXcYdlqmQtrJRud35M2tB98bb3OfoTF9CcEKxpFGOEnGpVq_qh7J4mEqca_DouAUxDvAc1-cJNKfsfDtbXvtu8qwSqsjmFZF_aLKDUxmTLeFWBPXYgyMraPm8CbQ4ljKdKJZqnBYiKPtNYHwy9drR_3hWymbgVZ1xegScuEAKuskCBXQSl9wNaOJHf1Ij_n17uayWJHzcpsfwZzCuk0k_U-_KDZQSwG1MJ",
-    status: "Active",
-    rating: 4.8,
-    reviews: 345,
-  },
-];
 
 const topPerformers = [
   {

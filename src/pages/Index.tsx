@@ -1,4 +1,4 @@
-import { useCallback, useEffect } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import DesignColors from "../lib/utils";
 import Nav from "../components/Index/Navbar/Nav";
@@ -9,9 +9,11 @@ import HowItWorks from "../components/Index/HowItWorks/HowItWorks";
 import Pricing from "../components/Index/Pricing/Pricing";
 import FAQ from "../components/Index/FAQ/FAQ";
 import Footer from "../components/Index/Footer/Footer";
+import JoinTeamModal from "../components/Index/JoinTeam/JoinTeamModal";
 
 export default function Index() {
     const navigate = useNavigate();
+    const [isApplyOpen, setIsApplyOpen] = useState(false);
 
     const onLogin = useCallback(() => {
         navigate("/login");
@@ -39,9 +41,9 @@ export default function Index() {
 
     return (
         <div style={{ backgroundColor: DesignColors().surface, backgroundImage: "radial-gradient(at 0% 0%, rgba(70,72,212,0.05) 0px, transparent 50%), radial-gradient(at 100% 0%, rgba(144,73,0,0.03) 0px, transparent 50%)", minHeight: "100vh" }}>
-            <Nav onLogin={onLogin} />
+            <Nav onLogin={onLogin} onApplyStaff={() => setIsApplyOpen(true)} />
             <main>
-                <div data-reveal><Hero onLogin={onLogin} /></div>
+                <div data-reveal><Hero onLogin={onLogin} onApplyStaff={() => setIsApplyOpen(true)} /></div>
                 <div data-reveal><TrustedBy /></div>
                 <div data-reveal><Features /></div>
                 <div data-reveal><HowItWorks /></div>
@@ -49,6 +51,10 @@ export default function Index() {
                 <div data-reveal><FAQ /></div>
             </main>
             <Footer />
+
+            {isApplyOpen && (
+                <JoinTeamModal onClose={() => setIsApplyOpen(false)} />
+            )}
         </div>
     );
 }

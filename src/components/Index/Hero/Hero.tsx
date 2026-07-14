@@ -3,7 +3,7 @@ import { glass } from "../../../styles/glass";
 import Icon from "../../Login/Icons";
 import HeroBtn from "./HeroBtn";
 
-export default function Hero({ onLogin }: { onLogin: () => void }) {
+export default function Hero({ onLogin, onApplyStaff }: { onLogin: () => void; onApplyStaff: () => void }) {
     return (
         <header style={{ paddingTop: 160, paddingBottom: 96, overflow: "hidden" }}>
             <div style={{ maxWidth: 1280, margin: "0 auto", padding: "0 20px", display: "grid", gridTemplateColumns: "1fr 1fr", alignItems: "center", gap: 64 }}>
@@ -19,7 +19,7 @@ export default function Hero({ onLogin }: { onLogin: () => void }) {
                     </p>
                     <div style={{ display: "flex", gap: 16 }}>
                         <HeroBtn label="Book Now" primary onClick={onLogin} />
-                        <HeroBtn label="Learn More" onClick={() => { }} />
+                        <HeroBtn label="Join as Staff" onClick={onApplyStaff} />
                     </div>
                     <div style={{ display: "flex", alignItems: "center", gap: 16, paddingTop: 16 }}>
                         <div style={{ display: "flex" }}>

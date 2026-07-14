@@ -1,4 +1,3 @@
-import { ChevronDown, Star } from "lucide-react";
 import { Colors } from "../../../../lib/utils";
 import StatusBadge from "./StatusBadge";
 
@@ -67,17 +66,35 @@ export default function MainTable({ staffMembers }: MainTableProps) {
               >
                 <td className="px-4 py-3">
                   <div className="flex items-center gap-2.5">
-                    <div className="w-8 h-8 rounded-full overflow-hidden bg-slate-100 flex items-center justify-center">
-                      {s.profile?.profile_photo || s.avatar ? (
-                        <img
-                          className="w-full h-full object-cover object-top"
-                          src={s.profile?.profile_photo || s.avatar}
-                          alt={s.name}
-                        />
+                    <div className="w-8 h-8 rounded-full flex-shrink-0 relative">
+                      {(s.profile?.profile_photo || s.avatar) ? (
+                        <>
+                          <img
+                            className="w-8 h-8 rounded-full object-cover object-top"
+                            src={s.profile?.profile_photo || s.avatar}
+                            alt={s.name}
+                            onError={(e) => {
+                              (e.currentTarget as HTMLImageElement).style.display = "none";
+                              (e.currentTarget.nextElementSibling as HTMLElement)!.style.display = "flex";
+                            }}
+                          />
+                          <div
+                            className="w-8 h-8 rounded-full absolute inset-0 items-center justify-center text-xs font-bold text-white"
+                            style={{
+                              background: "linear-gradient(135deg,#4648d4,#7c3aed)",
+                              display: "none",
+                            }}
+                          >
+                            {s.name?.charAt(0)?.toUpperCase() ?? "?"}
+                          </div>
+                        </>
                       ) : (
-                        <span className="text-xs font-semibold text-slate-400">
-                          {s.name ? s.name.charAt(0).toUpperCase() : ""}
-                        </span>
+                        <div
+                          className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold text-white"
+                          style={{ background: "linear-gradient(135deg,#4648d4,#7c3aed)" }}
+                        >
+                          {s.name?.charAt(0)?.toUpperCase() ?? "?"}
+                        </div>
                       )}
                     </div>
 

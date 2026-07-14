@@ -3,7 +3,7 @@ import DesignColors from "../../../lib/utils";
 import NavGhostBtn from "./NavGhostBtn";
 import NavPrimaryBtn from "./NavPrimaryBtn";
 
-export default function Nav({ onLogin }: { onLogin: () => void }) {
+export default function Nav({ onLogin, onApplyStaff }: { onLogin: () => void; onApplyStaff: () => void }) {
     const [scrolled, setScrolled] = useState(false);
     useEffect(() => {
         const onScroll = () => setScrolled(window.scrollY > 20);
@@ -38,6 +38,7 @@ export default function Nav({ onLogin }: { onLogin: () => void }) {
                     </div>
                 </div>
                 <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
+                    <NavGhostBtn label="Join as Staff" onClick={onApplyStaff} />
                     <NavGhostBtn label="Sign Up" onClick={onLogin} />
                     <NavPrimaryBtn label="Book Now" onClick={onLogin} />
                 </div>

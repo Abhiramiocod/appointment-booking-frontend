@@ -48,6 +48,8 @@ export const Colors = {
   outline: "#767586",
   errorContainer: "#ffdad6",
   onErrorContainer: "#93000a",
+  inverseSurface: "#303038",
+  inverseOnSurface: "#f2effb",
 };
 
 export const statusStyles = {

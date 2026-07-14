@@ -1,77 +1,18 @@
-import { useState } from "react";
-import { Download, Clock, CheckCircle2, XCircle } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Clock, CheckCircle2, XCircle } from "lucide-react";
 import StaffKpiCard from "../../../components/Admin/Staffs/StaffRequests/StaffKpiCards";
 import StaffFilterBar from "../../../components/Admin/Staffs/StaffRequests/StaffFilterBar";
 import StaffRequestTable from "../../../components/Admin/Staffs/StaffRequests/StaffRequestTable";
 import StaffRequestModal from "../../../components/Admin/Staffs/StaffRequests/StaffRequestModal";
+import { Colors } from "../../../lib/utils";
+import api from "../../../lib/api";
 
-// ---- Design tokens ----
-const colors = {
-  primary: "#4648d4",
-  primaryContainer: "#6063ee",
-  onSurface: "#1b1b23",
-  onSurfaceVariant: "#464554",
-  outline: "#767586",
-  outlineVariant: "#c7c4d7",
-  surface: "#fcf8ff",
-  surfaceContainer: "#efecf8",
-  surfaceContainerLow: "#f5f2fe",
-  surfaceContainerHigh: "#e9e6f3",
-  error: "#ba1a1a",
-  errorContainer: "#ffdad6",
-  onErrorContainer: "#93000a",
-};
 
-// ---- Mock data ----
-const initialRequests = [
-  {
-    id: 1,
-    name: "Sarah Jenkins",
-    email: "s.jenkins@example.com",
-    phone: "(555) 012-3456",
-    date: "Oct 14, 2023",
-    status: "Pending",
-    role: "Senior Stylist",
-    tags: ["Expert", "8+ Years Experience"],
-    bio: "Passionate about precision cutting and avant-garde styling. Looking to join a forward-thinking studio that values artistic freedom and client satisfaction.",
-    certifications: ["Master Colorist License", "Advanced Barbering Cert"],
-    avatar:
-      "https://lh3.googleusercontent.com/aida-public/AB6AXuAmxj2GaLIC0xVTj2qf7RiWqcDj34DaxL31jJZhiY3mcADSbafFYz5zQBte-PwffQhYe_ILYt4ztKaTUcxrqXdL8mWJMbptuSJrj7hZ5VVpCQarwNGoUySeJ1c3jCOuirbmjOdroFL-oKTf9XxYDeDmYXGhZ4k6Eehmt8JIfrWgiGteKj1ZVkN3KEUcVZbzrW9FsWZn2p-FjHfLBjtIKAgwMv_b8AHkPTdEnaMPSGu8qDMcv-NElVeahLtV_FLxICydzDi5QOS6cZJi",
-    largeAvatar:
-      "https://lh3.googleusercontent.com/aida-public/AB6AXuDxqCVFp7Lq6VqhV5NbqXOO0eFOH4OhpmL2QkfDziust4EplcWO-MRiWuKODskgwrvnGMVPJaZxVpbnm8UxoTX8aWuMg2Z_GnmKWxHMQ9WHDhoDQKz0veU1_tYUyGsycMCWXOPn739bGvN_SI8eC4WKAzCW8nH3ySr1I9vfOr5Ae03H37ubCvcXJFpNuL3PLlRTu5gFV534l9uNNR4pj52A14UIIhPvsjTa_7wIsHXOjsY7jfLDhNOogiPgBv83YTQRS6t55C3jhRtV",
-  },
-  {
-    id: 2,
-    name: "Marcus Thompson",
-    email: "m.thompson@example.com",
-    phone: "(555) 098-7654",
-    date: "Oct 13, 2023",
-    status: "Approved",
-    role: "Barber",
-    tags: ["Skilled", "5+ Years Experience"],
-    bio: "Focused on classic barbering with a modern edge.",
-    certifications: ["Advanced Barbering Cert"],
-    avatar:
-      "https://lh3.googleusercontent.com/aida-public/AB6AXuDYFahsQVoxPQM6HQJny0WScnxB6okB_yjVNuiljoHra2crvHpZaHATfOAZU-PqHNA3UVm8SxpzOUmsPqtFWfHyhqf14_SA2u6uzNx0fDj0GYJlgojUBW3-8fOdMClu3Eo3j4S73ZFIQFwhdir7cgBV8I-h_E0WrALS8xbxXnlV4m2QS2Wh4a5kdzdjlCwm9zVSNhs_Lmi-wcwTnU6inL441ntpl8j7Ewup69af2V1QxZyrLddhe8sZf_Sesg06EPfJwmgLoRQj308n",
-  },
-  {
-    id: 3,
-    name: "Elena Rodriguez",
-    email: "e.rodriguez@example.com",
-    phone: "(555) 442-1100",
-    date: "Oct 12, 2023",
-    status: "Rejected",
-    role: "Aesthetician",
-    tags: ["Expert", "10+ Years Experience"],
-    bio: "Specializes in advanced skincare treatments.",
-    certifications: ["Medical Aesthetics License"],
-    avatar:
-      "https://lh3.googleusercontent.com/aida-public/AB6AXuBkUFmT6n1-MT_aVMiq3d4wuxzkkiaUx6dTywZ_ZomNpTD76tGGA_ula0xj4_WHBDaEOre7ZDj6c5_fxt4j8y7tOKWkCjtzfapRllLbWesD4UdypON83MLguFSNpSBIfPAuexUud66AXB3sR7y78r_oXpsOMngY1PN4-tsutkYxvAJQZ0Mna3d1Tjp0zE5gDC9cnC1ZYR9T8CPOe2hL_yqdY1ggX4DJZIRy8DIxNJYaXiO7CfFgQRfNVgOhP6m81lKRuyDOrfpKxwyV",
-  },
-];
 
 export default function StaffRequestsContent() {
-  const [requests, setRequests] = useState(initialRequests);
+  const [requests, setRequests] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [statusFilter, setStatusFilter] = useState("All Status");
   const [sortBy, setSortBy] = useState("Newest First");
   const [search, setSearch] = useState("");
@@ -85,18 +26,58 @@ export default function StaffRequestsContent() {
     setRejectNote("");
   };
 
-  const approve = (request) => {
-    setRequests((prev) =>
-      prev.map((r) => (r.id === request.id ? { ...r, status: "Approved" } : r)),
-    );
-    setModal({ type: "success", request });
+  const approve = async (request) => {
+    try {
+      await api.patch(`/admin/staff/requests/${request.id}/approve`);
+      await fetchStaffRequests();
+      setModal({ type: "success", request });
+    } catch (err) {
+      console.error("Approve failed", err);
+    }
   };
 
-  const confirmReject = (request) => {
-    setRequests((prev) =>
-      prev.map((r) => (r.id === request.id ? { ...r, status: "Rejected" } : r)),
-    );
-    closeModal();
+  const confirmReject = async (request) => {
+    try {
+      await api.patch(`/admin/staff/requests/${request.id}/reject`, {
+        note: rejectNote,
+      });
+      await fetchStaffRequests();
+      closeModal();
+    } catch (err) {
+      console.error("Reject failed", err);
+    }
+  };
+
+  const [toast, setToast] = useState<string | null>(null);
+
+  const confirmDelete = async (request: any) => {
+    try {
+      await api.delete(`/admin/staff/requests/${request.id}`);
+      await fetchStaffRequests();
+      closeModal();
+      setToast(`${request.name}'s request has been deleted.`);
+      setTimeout(() => setToast(null), 3000);
+    } catch (err) {
+      console.error("Delete failed", err);
+    }
+  };
+
+  const updateStatus = async (request: any, status: string) => {
+    try {
+      await api.patch(`/admin/staff/${request.user_id}/status`, { employment_status: status });
+      await fetchStaffRequests();
+      closeModal();
+      const labels: Record<string, string> = {
+        active: "Active",
+        inactive: "Inactive",
+        on_leave: "On Leave",
+        terminated: "Terminated",
+      };
+      setToast(`${request.name}'s status updated to ${labels[status] ?? status}.`);
+      setTimeout(() => setToast(null), 3000);
+    } catch (err) {
+      console.error("Status update failed", err);
+    }
   };
 
   const pending = requests.filter((r) => r.status === "Pending").length;
@@ -110,10 +91,34 @@ export default function StaffRequestsContent() {
     return matchesStatus && matchesSearch;
   });
 
+  const fetchStaffRequests = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const response = await api.get("/admin/staff/requests");
+      const normalize = (s: string) =>
+        s ? s.charAt(0).toUpperCase() + s.slice(1).toLowerCase() : s;
+      const data = (response.data.data || []).map((r: any) => ({
+        ...r,
+        status: normalize(r.status),
+      }));
+      setRequests(data);
+    } catch (err) {
+      console.error(err);
+      setError("Failed to load staff requests. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchStaffRequests();
+  }, []);
+
   return (
     <div
       className="min-h-screen w-full"
-      style={{ backgroundColor: colors.surface }}
+      style={{ backgroundColor: Colors.surface }}
     >
       <div className="px-12 py-10 space-y-8 max-w-[1400px] mx-auto">
         {/* Header */}
@@ -121,25 +126,15 @@ export default function StaffRequestsContent() {
           <div>
             <h2
               className="text-2xl font-semibold"
-              style={{ color: colors.onSurface }}
+              style={{ color: Colors.onSurface }}
             >
               Staff Requests
             </h2>
-            <p className="mt-1" style={{ color: colors.onSurfaceVariant }}>
+            <p className="mt-1" style={{ color: Colors.onSurfaceVariant }}>
               Review and manage incoming staff applications and professional
               credentials.
             </p>
           </div>
-          <button
-            className="flex items-center gap-2 bg-white border px-5 py-2.5 rounded-xl text-sm font-medium hover:bg-slate-50 transition-all active:scale-95 shadow-sm"
-            style={{
-              color: colors.onSurface,
-              borderColor: "rgba(199,196,215,0.4)",
-            }}
-          >
-            <Download size={18} />
-            Export CSV
-          </button>
         </div>
 
         {/* KPI Row */}
@@ -147,7 +142,7 @@ export default function StaffRequestsContent() {
           <StaffKpiCard
             icon={<Clock size={22} fill="currentColor" fillOpacity={0.15} />}
             iconBg="rgba(70,72,212,0.1)"
-            iconColor={colors.primary}
+            iconColor={Colors.primary}
             label="Pending Requests"
             value={String(pending).padStart(2, "0")}
           />
@@ -161,7 +156,7 @@ export default function StaffRequestsContent() {
           <StaffKpiCard
             icon={<XCircle size={22} />}
             iconBg="rgba(186,26,26,0.1)"
-            iconColor={colors.error}
+            iconColor={Colors.error}
             label="Rejected Today"
             value={String(rejectedToday).padStart(2, "0")}
           />
@@ -178,12 +173,32 @@ export default function StaffRequestsContent() {
         />
 
         {/* Table */}
-        <StaffRequestTable
-          filtered={filtered}
-          requests={requests}
-          setModal={setModal}
-          approve={approve}
-        />
+        {loading ? (
+          <div className="flex justify-center items-center py-20">
+            <div
+              className="w-8 h-8 rounded-full border-2 border-t-transparent animate-spin"
+              style={{ borderColor: Colors.primary, borderTopColor: "transparent" }}
+            />
+          </div>
+        ) : error ? (
+          <div className="flex flex-col items-center py-20 gap-3">
+            <p style={{ color: Colors.error }}>{error}</p>
+            <button
+              onClick={fetchStaffRequests}
+              className="px-4 py-2 rounded-lg text-sm font-medium text-white"
+              style={{ backgroundColor: Colors.primary }}
+            >
+              Retry
+            </button>
+          </div>
+        ) : (
+          <StaffRequestTable
+            filtered={filtered}
+            requests={requests}
+            setModal={setModal}
+            approve={approve}
+          />
+        )}
       </div>
 
       {/* Modals */}
@@ -192,9 +207,40 @@ export default function StaffRequestsContent() {
         closeModal={closeModal}
         approve={approve}
         confirmReject={confirmReject}
+        confirmDelete={confirmDelete}
+        updateStatus={updateStatus}
         rejectNote={rejectNote}
         setRejectNote={setRejectNote}
+        onReject={(request) => setModal({ type: "reject", request })}
       />
+
+      {/* Toast */}
+      {toast && (
+        <div
+          style={{
+            position: "fixed",
+            bottom: 28,
+            left: "50%",
+            transform: "translateX(-50%)",
+            zIndex: 300,
+            background: Colors.inverseSurface,
+            color: Colors.inverseOnSurface,
+            padding: "12px 24px",
+            borderRadius: 12,
+            fontSize: 14,
+            fontWeight: 500,
+            boxShadow: "0 8px 32px rgba(0,0,0,0.22)",
+            display: "flex",
+            alignItems: "center",
+            gap: 10,
+            animation: "fadeInUp 0.25s ease",
+          }}
+        >
+          <span style={{ fontSize: 16 }}>🗑️</span>
+          {toast}
+          <style>{`@keyframes fadeInUp { from { opacity:0; transform:translate(-50%,12px); } to { opacity:1; transform:translate(-50%,0); } }`}</style>
+        </div>
+      )}
     </div>
   );
 }

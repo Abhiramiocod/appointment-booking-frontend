@@ -12,7 +12,7 @@ export default function AdminTopbar() {
     console.log("🔐 Logging out...");
     localStorage.removeItem("token");
     localStorage.removeItem("user");
-    navigate("/login");
+    navigate("/");
   };
 
   const userImageUrl = user?.image ?? "";

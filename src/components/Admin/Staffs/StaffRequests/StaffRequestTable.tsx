@@ -3,7 +3,7 @@ import {
   ChevronLeft,
   ChevronRight,
   Eye,
-  Trash2,
+  Settings2,
   XCircle,
 } from "lucide-react";
 import { Colors } from "../../../../lib/utils";
@@ -23,75 +23,100 @@ export default function StaffRequestTable({
   approve,
 }: StaffRequestTableProps) {
   return (
-    <div className="bg-white/70 backdrop-blur-xl border border-white/40 shadow-sm rounded-xl overflow-hidden">
+    <div className="bg-white/70 backdrop-blur-xl border border-slate-200/60 shadow-sm rounded-xl overflow-hidden">
       <div className="overflow-x-auto">
         <table className="w-full text-left border-collapse">
           <thead>
             <tr
-              className="border-b"
               style={{
-                backgroundColor: "rgba(239,236,248,0.3)",
-                borderColor: "rgba(199,196,215,0.2)",
+                backgroundColor: "rgba(245,242,254,0.5)",
               }}
             >
               <th
-                className="px-6 py-4 text-xs font-semibold uppercase tracking-wider"
-                style={{ color: Colors.onSurfaceVariant }}
+                className="px-4 py-3 text-[11px] font-bold uppercase tracking-wide"
+                style={{ color: Colors.outline }}
               >
                 Applicant
               </th>
               <th
-                className="px-6 py-4 text-xs font-semibold uppercase tracking-wider"
-                style={{ color: Colors.onSurfaceVariant }}
+                className="px-4 py-3 text-[11px] font-bold uppercase tracking-wide"
+                style={{ color: Colors.outline }}
+              >
+                Designation
+              </th>
+              <th
+                className="px-4 py-3 text-[11px] font-bold uppercase tracking-wide"
+                style={{ color: Colors.outline }}
+              >
+                Experience
+              </th>
+              <th
+                className="px-4 py-3 text-[11px] font-bold uppercase tracking-wide"
+                style={{ color: Colors.outline }}
               >
                 Phone Number
               </th>
               <th
-                className="px-6 py-4 text-xs font-semibold uppercase tracking-wider"
-                style={{ color: Colors.onSurfaceVariant }}
+                className="px-4 py-3 text-[11px] font-bold uppercase tracking-wide"
+                style={{ color: Colors.outline }}
               >
                 Applied Date
               </th>
               <th
-                className="px-6 py-4 text-xs font-semibold uppercase tracking-wider"
-                style={{ color: Colors.onSurfaceVariant }}
+                className="px-4 py-3 text-[11px] font-bold uppercase tracking-wide"
+                style={{ color: Colors.outline }}
               >
                 Status
               </th>
               <th
-                className="px-6 py-4 text-xs font-semibold uppercase tracking-wider text-right"
-                style={{ color: Colors.onSurfaceVariant }}
+                className="px-4 py-3 text-[11px] font-bold uppercase tracking-wide text-right"
+                style={{ color: Colors.outline }}
               >
                 Actions
               </th>
             </tr>
           </thead>
-          <tbody
-            className="divide-y"
-            style={{ borderColor: "rgba(199,196,215,0.1)" }}
-          >
+          <tbody>
             {filtered.map((r) => (
               <tr
                 key={r.id}
-                className="hover:bg-slate-50/60 transition-colors group"
+                className="hover:bg-[#4646d4]/5 transition-colors border-b last:border-b-0"
+                style={{
+                  borderColor: "rgba(199,196,215,0.15)",
+                }}
               >
-                <td className="px-6 py-4">
-                  <div className="flex items-center gap-3">
-                    <img
-                      className="w-9 h-9 rounded-full object-cover shadow-sm"
-                      src={r.avatar}
-                      alt={r.name}
-                    />
+                <td className="px-4 py-3">
+                  <div className="flex items-center gap-2.5">
+                    {r.avatar ? (
+                      <img
+                        className="w-8 h-8 rounded-full object-cover shadow-sm flex-shrink-0"
+                        src={r.avatar}
+                        alt={r.name}
+                        onError={(e) => {
+                          (e.currentTarget as HTMLImageElement).style.display = "none";
+                          (e.currentTarget.nextElementSibling as HTMLElement)!.style.display = "flex";
+                        }}
+                      />
+                    ) : null}
+                    <div
+                      className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold text-white shadow-sm flex-shrink-0"
+                      style={{
+                        background: "linear-gradient(135deg,#4648d4,#7c3aed)",
+                        display: r.avatar ? "none" : "flex",
+                      }}
+                    >
+                      {r.name?.charAt(0)?.toUpperCase() ?? "?"}
+                    </div>
                     <div>
                       <p
-                        className="font-semibold leading-tight"
+                        className="font-semibold text-sm leading-tight"
                         style={{ color: Colors.onSurface }}
                       >
                         {r.name}
                       </p>
                       <p
-                        className="text-sm"
-                        style={{ color: Colors.onSurfaceVariant }}
+                        className="text-[12px] leading-tight"
+                        style={{ color: Colors.outline }}
                       >
                         {r.email}
                       </p>
@@ -99,22 +124,35 @@ export default function StaffRequestTable({
                   </div>
                 </td>
                 <td
-                  className="px-6 py-4 text-sm"
-                  style={{ color: Colors.onSurfaceVariant }}
+                  className="px-4 py-3 text-sm font-medium"
+                  style={{ color: Colors.onSurface }}
                 >
-                  {r.phone}
+                  {r.designation?.name || r.role || "—"}
                 </td>
                 <td
-                  className="px-6 py-4 text-sm"
-                  style={{ color: Colors.onSurfaceVariant }}
+                  className="px-4 py-3 text-sm font-medium text-slate-700"
                 >
-                  {r.date}
+                  {r.experience_years !== undefined && r.experience_years !== null
+                    ? `${r.experience_years} yrs`
+                    : r.experience || "—"}
                 </td>
-                <td className="px-6 py-4">
+                <td
+                  className="px-4 py-3 text-sm"
+                  style={{ color: Colors.outline }}
+                >
+                  {r.phone || "—"}
+                </td>
+                <td
+                  className="px-4 py-3 text-sm"
+                  style={{ color: Colors.outline }}
+                >
+                  {r.created_at ? new Date(r.created_at).toLocaleDateString() : r.date || "—"}
+                </td>
+                <td className="px-4 py-3">
                   <StatusPill status={r.status} />
                 </td>
-                <td className="px-6 py-4 text-right">
-                  <div className="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                <td className="px-4 py-3 text-right">
+                  <div className="flex items-center justify-end gap-1">
                     <button
                       onClick={() => setModal({ type: "view", request: r })}
                       className="p-2 rounded-lg transition-colors hover:bg-[#4648d4]/10"
@@ -146,11 +184,14 @@ export default function StaffRequestTable({
                       </>
                     ) : (
                       <button
-                        className="p-2 rounded-lg transition-colors hover:bg-red-100"
-                        style={{ color: Colors.error }}
-                        title="Delete"
+                        onClick={() =>
+                          setModal({ type: "status", request: r, currentStatus: r.employment_status ?? "" })
+                        }
+                        className="p-2 rounded-lg transition-colors hover:bg-[#4648d4]/10"
+                        style={{ color: Colors.primary }}
+                        title="Change Status"
                       >
-                        <Trash2 size={20} />
+                        <Settings2 size={20} />
                       </button>
                     )}
                   </div>
@@ -160,9 +201,9 @@ export default function StaffRequestTable({
             {filtered.length === 0 && (
               <tr>
                 <td
-                  colSpan={5}
-                  className="px-6 py-10 text-center text-sm"
-                  style={{ color: Colors.onSurfaceVariant }}
+                  colSpan={7}
+                  className="px-4 py-10 text-center text-sm"
+                  style={{ color: Colors.outline }}
                 >
                   No applicants match your search.
                 </td>
