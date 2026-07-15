@@ -12,9 +12,24 @@ import AdminClients from "./pages/Admin/Clients";
 import AdminAnalytics from "./pages/Admin/Analytics";
 import AdminSettings from "./pages/Admin/Settings";
 
+import StaffSchedule from "./pages/Staff/Schedule";
+import StaffServices from "./pages/Staff/Services";
+import StaffReviews from "./pages/Staff/Reviews";
+import StaffWorkingHours from "./pages/Staff/WorkingHours";
+
 import StaffDashboard from "./pages/Staff/Dashboard";
 import CustomerDashboard from "./pages/Customer/Dashboard";
 import Register from "./pages/Register";
+
+import StaffLayout from "./layouts/StaffLayout";
+
+import StaffProfile from "./pages/Staff/Profile";
+import StaffChangePassword from "./pages/Staff/ChangePassword";
+
+import CustomerLayout from "./layouts/CustomerLayout";
+import CustomerSchedule from "./pages/Customer/Schedule";
+import CustomerServices from "./pages/Customer/Services";
+import CustomerBookAppointment from "./pages/Customer/BookAppointment";
 
 export default function App() {
   return (
@@ -40,9 +55,24 @@ export default function App() {
         <Route path="settings" element={<AdminSettings />} />
       </Route>
 
-      {/* Role-based Dashboards */}
-      <Route path="/staff" element={<StaffDashboard />} />
-      <Route path="/customer" element={<CustomerDashboard />} />
+      {/* Staff Routes with Nested Layout */}
+      <Route path="/staff" element={<StaffLayout />}>
+        <Route index element={<StaffDashboard />} />
+        <Route path="schedule" element={<StaffSchedule />} />
+        <Route path="working-hours" element={<StaffWorkingHours />} />
+        <Route path="services" element={<StaffServices />} />
+        <Route path="reviews" element={<StaffReviews />} />
+        <Route path="profile" element={<StaffProfile />} />
+        <Route path="change-password" element={<StaffChangePassword />} />
+      </Route>
+
+      {/* Customer Routes with Nested Layout */}
+      <Route path="/customer" element={<CustomerLayout />}>
+        <Route index element={<CustomerDashboard />} />
+        <Route path="schedule" element={<CustomerSchedule />} />
+        <Route path="services" element={<CustomerServices />} />
+        <Route path="book" element={<CustomerBookAppointment />} />
+      </Route>
 
       {/* 404 */}
       <Route path="*" element={<Navigate to="/" replace />} />

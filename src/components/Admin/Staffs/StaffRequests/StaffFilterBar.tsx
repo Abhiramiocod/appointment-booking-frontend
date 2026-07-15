@@ -42,10 +42,10 @@ export default function StaffFilterBar({
           className="bg-white rounded-lg px-3 py-2 text-sm border focus:ring-2 focus:outline-none"
           style={{ borderColor: "rgba(199,196,215,0.4)" }}
         >
-          <option>All Status</option>
-          <option>Pending</option>
-          <option>Approved</option>
-          <option>Rejected</option>
+          <option value="Pending">Pending</option>
+          <option value="Approved">Approved</option>
+          <option value="Rejected">Rejected</option>
+          <option value="All">All</option>
         </select>
       </div>
       <div className="flex items-center gap-3">

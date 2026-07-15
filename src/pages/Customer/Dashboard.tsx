@@ -1,7 +1,278 @@
-export default function CustomerDashboard() {
-    return (
-        <div>
-            <h1>Customer Dashboard</h1>
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import api from "../../lib/api";
+import { Colors } from "../../lib/utils";
+import {
+  CalendarClock,
+  CheckCircle2,
+  Star,
+  BarChart3,
+  Calendar,
+  Clock,
+  PlusCircle,
+  Users,
+  History,
+  Leaf,
+  Smile,
+  Scissors,
+  Loader2,
+  Check,
+  X
+} from "lucide-react";
+
+import Greeting from "../../components/Customer/Dashboard/Greeting";
+import Stats from "../../components/Customer/Dashboard/Stats";
+import FeaturedCard from "../../components/Customer/Dashboard/FeaturedCard";
+import QuickActions from "../../components/Customer/Dashboard/QuickActions";
+import RecentActivity from "../../components/Customer/Dashboard/RecentActivity";
+import Recommended from "../../components/Customer/Dashboard/Recommended";
+
+const quickActions = [
+  { label: "Book New", icon: PlusCircle },
+  { label: "Browse Staff", icon: Users },
+  { label: "My History", icon: History },
+];
+
+const recommended = [
+  {
+    icon: Leaf,
+    name: "Deep Tissue Massage",
+    desc: "60 min session • Muscle recovery",
+    price: "$120",
+  },
+  {
+    icon: Smile,
+    name: "Hydrating Facial",
+    desc: "45 min session • Skin rejuvenation",
+    price: "$85",
+  },
+  {
+    icon: Scissors,
+    name: "Premium Beard Sculpt",
+    desc: "30 min session • Sharp finish",
+    price: "$45",
+  },
+];
+
+interface Appointment {
+  id: number;
+  appointment_date: string;
+  start_time: string;
+  end_time: string;
+  status: string;
+  notes?: string;
+  rejection_reason?: string;
+  proposed_date?: string;
+  proposed_time?: string;
+  proposed_note?: string;
+  staff?: {
+    name: string;
+  };
+  service?: {
+    name: string;
+    duration: number;
+    price: string;
+  };
+}
+
+export default function LuminaCustomerDashboard() {
+  const [statsData, setStatsData] = useState({
+    upcoming: 0,
+    completed: 0,
+    cancelled: 0,
+  });
+  const [appointments, setAppointments] = useState<Appointment[]>([]);
+  const [loading, setLoading] = useState(true);
+  
+  const [actioningId, setActioningId] = useState<number | null>(null);
+  const [toast, setToast] = useState<string | null>(null);
+
+  const fetchDashboardData = async () => {
+    try {
+      setLoading(true);
+      const [statsRes, apptsRes] = await Promise.all([
+        api.get("/customer/dashboard"),
+        api.get("/customer/appointments"),
+      ]);
+
+      const stats = statsRes.data;
+      setStatsData({
+        upcoming: stats?.upcoming_appointments || 0,
+        completed: stats?.completed_appointments || 0,
+        cancelled: stats?.cancelled_appointments || 0,
+      });
+
+      setAppointments(apptsRes.data?.data || apptsRes.data || []);
+    } catch (err) {
+      console.error("Dashboard load failed", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchDashboardData();
+  }, []);
+
+  const handleAcceptReschedule = async (id: number) => {
+    setActioningId(id);
+    try {
+      await api.patch(`/customer/appointments/${id}/accept-reschedule`);
+      setToast("Schedule proposal accepted successfully!");
+      fetchDashboardData();
+      setTimeout(() => setToast(null), 3000);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setActioningId(null);
+    }
+  };
+
+  const handleDeclineReschedule = async (id: number) => {
+    setActioningId(id);
+    try {
+      await api.patch(`/customer/appointments/${id}/decline-reschedule`);
+      setToast("Schedule proposal declined.");
+      fetchDashboardData();
+      setTimeout(() => setToast(null), 3000);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setActioningId(null);
+    }
+  };
+
+  // Find reschedule requests
+  const rescheduleProposal = appointments.find(
+    (a) => a.status.toLowerCase() === "reschedule_requested"
+  );
+
+  const statsList = [
+    { label: "Upcoming Sessions", value: String(statsData.upcoming), icon: CalendarClock },
+    { label: "Completed Sessions", value: String(statsData.completed), icon: CheckCircle2 },
+    { label: "Total Bookings", value: String(statsData.upcoming + statsData.completed + statsData.cancelled), icon: BarChart3 },
+    { label: "Favorite Specialist", value: "Sarah", icon: Star },
+  ];
+
+  // Map real activities to the RecentActivity component format
+  const mappedActivity = appointments.slice(0, 5).map((a) => ({
+    date: a.appointment_date,
+    staff: a.staff?.name || "Specialist",
+    service: a.service?.name || "Session",
+    status: a.status.toLowerCase() as any,
+  }));
+
+  return (
+    <div style={{ padding: "28px 32px", flex: 1, width: "100%" }}>
+      {/* Greeting */}
+      <Greeting />
+
+      {/* Reschedule Proposal Alert Card */}
+      {rescheduleProposal && (
+        <div className="mt-8 bg-indigo-50 border border-indigo-200/80 rounded-2xl p-6 shadow-md flex flex-col md:flex-row md:items-center justify-between gap-6 animation-fadeInUp">
+          <div className="space-y-2">
+            <h3 className="text-base font-extrabold text-indigo-950 flex items-center gap-2">
+              <span className="w-2 h-2 rounded-full bg-indigo-600 animate-pulse" />
+              Proposed Schedule Change
+            </h3>
+            <p className="text-slate-600 text-xs">
+              Specialist <span className="font-semibold text-slate-800">{rescheduleProposal.staff?.name}</span> requested a reschedule for your booking <span className="font-semibold text-slate-800">({rescheduleProposal.service?.name})</span>.
+            </p>
+            
+            <div className="flex flex-wrap items-center gap-6 mt-3 bg-white/70 p-4 rounded-xl border border-indigo-100 text-xs">
+              <div>
+                <p className="text-[9px] text-slate-400 font-bold uppercase tracking-wider">Current Schedule</p>
+                <p className="font-bold text-slate-700 mt-0.5">{rescheduleProposal.appointment_date} at {rescheduleProposal.start_time.substring(0, 5)}</p>
+              </div>
+              <div className="h-6 w-px bg-slate-200 hidden sm:block" />
+              <div>
+                <p className="text-[9px] text-indigo-500 font-bold uppercase tracking-wider">Proposed Schedule</p>
+                <p className="font-bold text-indigo-700 mt-0.5">{rescheduleProposal.proposed_date} at {rescheduleProposal.proposed_time?.substring(0, 5)}</p>
+              </div>
+            </div>
+
+            {rescheduleProposal.proposed_note && (
+              <p className="text-slate-500 italic text-[11px] mt-2">
+                " {rescheduleProposal.proposed_note} "
+              </p>
+            )}
+          </div>
+
+          <div className="flex gap-2.5 shrink-0 self-end md:self-center">
+            <button
+              onClick={() => handleAcceptReschedule(rescheduleProposal.id)}
+              disabled={actioningId !== null}
+              className="px-4.5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 shadow-sm disabled:opacity-50"
+            >
+              {actioningId === rescheduleProposal.id ? <Loader2 size={13} className="animate-spin" /> : <Check size={13} />}
+              Accept New Time
+            </button>
+            <button
+              onClick={() => handleDeclineReschedule(rescheduleProposal.id)}
+              disabled={actioningId !== null}
+              className="px-4.5 py-2 bg-white border border-slate-200 hover:bg-red-50 hover:text-red-700 hover:border-red-100 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 shadow-sm disabled:opacity-50"
+            >
+              <X size={13} />
+              Decline
+            </button>
+          </div>
         </div>
-    );
+      )}
+
+      {/* Stats */}
+      <div className="mt-8">
+        <Stats stats={statsList} />
+      </div>
+
+      {/* Featured appointment + quick actions */}
+      <section className="grid grid-cols-1 lg:grid-cols-12 gap-6 mt-8">
+        {/* Featured card */}
+        <FeaturedCard />
+
+        {/* Quick actions */}
+        <QuickActions quickActions={quickActions} />
+      </section>
+
+      {/* Recent activity + recommended */}
+      <section className="grid grid-cols-1 lg:grid-cols-12 gap-6 mt-8">
+        {/* Recent activity table */}
+        {loading ? (
+          <div className="lg:col-span-8 bg-white p-10 flex justify-center items-center rounded-2xl border"><Loader2 className="animate-spin text-indigo-600" /></div>
+        ) : (
+          <RecentActivity activity={mappedActivity} />
+        )}
+
+        {/* Recommended */}
+        <Recommended recommended={recommended} />
+      </section>
+
+      {/* Toast popup */}
+      {toast && (
+        <div
+          style={{
+            position: "fixed",
+            bottom: 28,
+            left: "50%",
+            transform: "translateX(-50%)",
+            zIndex: 300,
+            background: Colors.inverseSurface,
+            color: Colors.inverseOnSurface,
+            padding: "12px 24px",
+            borderRadius: 12,
+            fontSize: 14,
+            fontWeight: 500,
+            boxShadow: "0 8px 32px rgba(0,0,0,0.22)",
+            display: "flex",
+            alignItems: "center",
+            gap: 10,
+            animation: "fadeInUp 0.25s ease",
+          }}
+        >
+          <span style={{ fontSize: 16 }}>✨</span>
+          {toast}
+          <style>{`@keyframes fadeInUp { from { opacity:0; transform:translate(-50%,12px); } to { opacity:1; transform:translate(-50%,0); } }`}</style>
+        </div>
+      )}
+    </div>
+  );
 }

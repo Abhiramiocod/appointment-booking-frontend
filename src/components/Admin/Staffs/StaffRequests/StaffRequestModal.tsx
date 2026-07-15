@@ -8,7 +8,7 @@ import StatusModal from "./StaffRequestModal/StatusModal";
 
 interface StaffRequestModalProps {
   modal: {
-    type: "view" | "reject" | "success" | "delete" | "status";
+    type: "view" | "reject" | "success" | "delete";
     request: any;
     currentStatus?: string;
   } | null;
@@ -16,7 +16,6 @@ interface StaffRequestModalProps {
   approve: (request: any) => void;
   confirmReject: (request: any) => void;
   confirmDelete: (request: any) => void;
-  updateStatus: (request: any, status: string) => Promise<void>;
   rejectNote: string;
   setRejectNote: (note: string) => void;
   onReject: (request: any) => void;
@@ -28,7 +27,6 @@ export default function StaffRequestModal({
   approve,
   confirmReject,
   confirmDelete,
-  updateStatus,
   rejectNote,
   setRejectNote,
   onReject,
@@ -75,8 +73,7 @@ export default function StaffRequestModal({
       {/* ───── Delete Modal ───── */}
       <DeleteModal modal={modal} closeModal={closeModal} confirmDelete={confirmDelete} />
 
-      {/* ───── Status Modal ───── */}
-      <StatusModal modal={modal} closeModal={closeModal} updateStatus={updateStatus} />
+
     </div>
   );
 }

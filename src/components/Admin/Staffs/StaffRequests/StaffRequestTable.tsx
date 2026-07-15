@@ -182,18 +182,7 @@ export default function StaffRequestTable({
                           <XCircle size={20} />
                         </button>
                       </>
-                    ) : (
-                      <button
-                        onClick={() =>
-                          setModal({ type: "status", request: r, currentStatus: r.employment_status ?? "" })
-                        }
-                        className="p-2 rounded-lg transition-colors hover:bg-[#4648d4]/10"
-                        style={{ color: Colors.primary }}
-                        title="Change Status"
-                      >
-                        <Settings2 size={20} />
-                      </button>
-                    )}
+                    ) : null}
                   </div>
                 </td>
               </tr>

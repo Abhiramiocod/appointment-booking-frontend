@@ -6,6 +6,9 @@ import MainTable from "../../../components/Admin/Staffs/StaffList/MainTable";
 import SidebarPerformanceInsights from "../../../components/Admin/Staffs/StaffList/SidebarPerformanceInsights";
 import { Colors } from "../../../lib/utils";
 import api from "../../../lib/api";
+import StatusModal from "../../../components/Admin/Staffs/StaffRequests/StaffRequestModal/StatusModal";
+import Body from "../../../components/Admin/Staffs/StaffRequests/StaffRequestModal/Body";
+
 
 
 const topPerformers = [
@@ -46,6 +49,31 @@ export default function StaffsList() {
 
   const [loading, setLoading] = useState(true);
   const [staffs, setStaffs] = useState([]);
+  
+  const [modal, setModal] = useState<{
+    type: "status" | "view";
+    request: any;
+    currentStatus?: string;
+  } | null>(null);
+  const [toast, setToast] = useState<string | null>(null);
+
+  const updateStatus = async (staff: any, status: string) => {
+    try {
+      await api.patch(`/admin/staff/${staff.id}/status`, { employment_status: status });
+      await fetchStaffs();
+      setModal(null);
+      const labels: Record<string, string> = {
+        active: "Active",
+        inactive: "Inactive",
+        on_leave: "On Leave",
+        terminated: "Terminated",
+      };
+      setToast(`${staff.name}'s status updated to ${labels[status] ?? status}.`);
+      setTimeout(() => setToast(null), 3000);
+    } catch (err) {
+      console.error("Status update failed", err);
+    }
+  };
 
   const fetchStaffs = async () => {
     try {
@@ -122,6 +150,7 @@ export default function StaffsList() {
             sortBy={sortBy}
             setSortBy={setSortBy}
             staffMembers={staffs}
+            setModal={setModal}
           />
 
           {/* Sidebar: Performance Insights */}
@@ -130,6 +159,92 @@ export default function StaffsList() {
           </aside>
         </div>
       </div>
+
+      {modal?.type === "status" && (
+        <div
+          className="fixed inset-0 z-[100] flex items-center justify-center p-6"
+          style={{
+            backgroundColor: "rgba(27,27,35,0.25)",
+            backdropFilter: "blur(6px)",
+          }}
+          onClick={() => setModal(null)}
+        >
+          <StatusModal modal={modal} closeModal={() => setModal(null)} updateStatus={updateStatus} />
+        </div>
+      )}
+
+      {modal?.type === "view" && (
+        <div
+          className="fixed inset-0 z-[100] flex items-center justify-center p-6"
+          style={{
+            backgroundColor: "rgba(27,27,35,0.25)",
+            backdropFilter: "blur(6px)",
+          }}
+          onClick={() => setModal(null)}
+        >
+          <div
+            className="bg-white rounded-2xl max-w-xl w-full max-h-[90vh] overflow-y-auto shadow-2xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex justify-between items-center px-6 py-4 border-b border-gray-100">
+              <h3 className="font-bold text-slate-800 text-lg">Staff Member Profile</h3>
+              <button onClick={() => setModal(null)} className="text-slate-400 hover:text-slate-600 font-semibold text-lg">&times;</button>
+            </div>
+            
+            <Body 
+              r={{
+                name: modal.request.name,
+                avatar: modal.request.profile?.profile_photo || modal.request.avatar,
+                role: modal.request.role,
+                designation: modal.request.profile?.designation,
+                experience_years: modal.request.profile?.experience_years,
+                email: modal.request.email,
+                phone: modal.request.profile?.phone,
+                bio: modal.request.profile?.bio
+              }} 
+              tags={[]} 
+              certifications={[]} 
+            />
+
+            <div className="px-6 py-4 border-t border-gray-100 flex justify-end">
+              <button
+                onClick={() => setModal(null)}
+                className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-sm rounded-lg transition-colors"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Toast */}
+      {toast && (
+        <div
+          style={{
+            position: "fixed",
+            bottom: 28,
+            left: "50%",
+            transform: "translateX(-50%)",
+            zIndex: 300,
+            background: Colors.inverseSurface,
+            color: Colors.inverseOnSurface,
+            padding: "12px 24px",
+            borderRadius: 12,
+            fontSize: 14,
+            fontWeight: 500,
+            boxShadow: "0 8px 32px rgba(0,0,0,0.22)",
+            display: "flex",
+            alignItems: "center",
+            gap: 10,
+            animation: "fadeInUp 0.25s ease",
+          }}
+        >
+          <span style={{ fontSize: 16 }}>✏️</span>
+          {toast}
+          <style>{`@keyframes fadeInUp { from { opacity:0; transform:translate(-50%,12px); } to { opacity:1; transform:translate(-50%,0); } }`}</style>
+        </div>
+      )}
     </div>
   );
 }

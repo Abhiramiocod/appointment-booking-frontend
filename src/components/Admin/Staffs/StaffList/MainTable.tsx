@@ -1,5 +1,6 @@
 import { Colors } from "../../../../lib/utils";
 import StatusBadge from "./StatusBadge";
+import { Eye } from "lucide-react";
 
 interface MainTableProps {
   filters: string[];
@@ -8,9 +9,18 @@ interface MainTableProps {
   sortBy: string;
   setSortBy: (sort: string) => void;
   staffMembers: any[];
+  setModal: (modal: any) => void;
 }
 
-export default function MainTable({ staffMembers }: MainTableProps) {
+export default function MainTable({
+  filters,
+  activeFilter,
+  setActiveFilter,
+  sortBy,
+  setSortBy,
+  staffMembers,
+  setModal,
+}: MainTableProps) {
   return (
     <div className="flex-[3] space-y-6">
       <div className="bg-white/70 backdrop-blur-xl border border-slate-200/60 shadow-sm rounded-xl overflow-hidden">
@@ -106,10 +116,10 @@ export default function MainTable({ staffMembers }: MainTableProps) {
                         {s.name}
                       </p>
                       <p
-                        className="text-[12px] leading-tight capitalize"
+                        className="text-[12px] leading-tight capitalize animate-pulse-once"
                         style={{ color: Colors.outline }}
                       >
-                        {s.role}
+                        {s.profile?.designation?.name || s.role}
                       </p>
                     </div>
                   </div>
@@ -150,12 +160,33 @@ export default function MainTable({ staffMembers }: MainTableProps) {
                 </td> */}
 
                 <td className="px-4 py-3 text-right">
-                  <button
-                    className="text-xs font-semibold hover:underline"
-                    style={{ color: Colors.primary }}
-                  >
-                    Manage
-                  </button>
+                  <div className="flex items-center justify-end gap-3">
+                    <button
+                      onClick={() =>
+                        setModal({
+                          type: "view",
+                          request: s,
+                        })
+                      }
+                      className="p-1 rounded hover:bg-slate-100 text-indigo-600 transition-colors"
+                      title="View Details"
+                    >
+                      <Eye size={16} />
+                    </button>
+                    <button
+                      onClick={() =>
+                        setModal({
+                          type: "status",
+                          request: s,
+                          currentStatus: s.profile?.employment_status || s.status || "active",
+                        })
+                      }
+                      className="text-xs font-semibold hover:underline font-medium"
+                      style={{ color: Colors.primary }}
+                    >
+                      Manage
+                    </button>
+                  </div>
                 </td>
               </tr>
             ))}

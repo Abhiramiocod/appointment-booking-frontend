@@ -13,7 +13,7 @@ export default function StaffRequestsContent() {
   const [requests, setRequests] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [statusFilter, setStatusFilter] = useState("All Status");
+  const [statusFilter, setStatusFilter] = useState("Pending");
   const [sortBy, setSortBy] = useState("Newest First");
   const [search, setSearch] = useState("");
 
@@ -62,23 +62,7 @@ export default function StaffRequestsContent() {
     }
   };
 
-  const updateStatus = async (request: any, status: string) => {
-    try {
-      await api.patch(`/admin/staff/${request.user_id}/status`, { employment_status: status });
-      await fetchStaffRequests();
-      closeModal();
-      const labels: Record<string, string> = {
-        active: "Active",
-        inactive: "Inactive",
-        on_leave: "On Leave",
-        terminated: "Terminated",
-      };
-      setToast(`${request.name}'s status updated to ${labels[status] ?? status}.`);
-      setTimeout(() => setToast(null), 3000);
-    } catch (err) {
-      console.error("Status update failed", err);
-    }
-  };
+
 
   const pending = requests.filter((r) => r.status === "Pending").length;
   const approvedToday = requests.filter((r) => r.status === "Approved").length;
@@ -86,7 +70,7 @@ export default function StaffRequestsContent() {
 
   const filtered = requests.filter((r) => {
     const matchesStatus =
-      statusFilter === "All Status" || r.status === statusFilter;
+      statusFilter === "All" || statusFilter === "All Status" || r.status === statusFilter;
     const matchesSearch = r.name.toLowerCase().includes(search.toLowerCase());
     return matchesStatus && matchesSearch;
   });
@@ -208,7 +192,6 @@ export default function StaffRequestsContent() {
         approve={approve}
         confirmReject={confirmReject}
         confirmDelete={confirmDelete}
-        updateStatus={updateStatus}
         rejectNote={rejectNote}
         setRejectNote={setRejectNote}
         onReject={(request) => setModal({ type: "reject", request })}
