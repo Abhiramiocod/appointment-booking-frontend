@@ -66,17 +66,8 @@ export default function CustomerTopbar() {
           marginLeft: "auto",
         }}
       >
-        <span style={{ color: "#767586", fontSize: 18, cursor: "pointer" }}>
-          🔔
-        </span>
-        <span style={{ color: "#767586", fontSize: 18, cursor: "pointer" }}>
-          🌙
-        </span>
 
         <div style={{ textAlign: "right", marginRight: 4 }}>
-          <div style={{ fontSize: 10, fontWeight: 600, color: "#4648d4", textTransform: "uppercase", letterSpacing: "0.05em" }}>
-            Customer Portal
-          </div>
           <div style={{ fontSize: 13, fontWeight: 600, color: "#1e1b4b" }}>
             {user?.name || "Customer User"}
           </div>

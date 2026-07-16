@@ -1,4 +1,7 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import api from "../../lib/api";
+import { Loader2 } from "lucide-react";
 import {
   AreaChart,
   Area,
@@ -10,116 +13,120 @@ import {
 import MiniBar from "../../components/Admin/Dashboard/Minibar";
 import ActivityAvatar from "../../components/Admin/Dashboard/ActivityAvatar";
 
-const bookingData = [
-  { day: "MON", completed: 30, cancellations: 10 },
-  { day: "TUE", completed: 45, cancellations: 8 },
-  { day: "WED", completed: 38, cancellations: 12 },
-  { day: "THU", completed: 50, cancellations: 6 },
-  { day: "FRI", completed: 60, cancellations: 9 },
-  { day: "SAT", completed: 75, cancellations: 14 },
-  { day: "SUN", completed: 90, cancellations: 11 },
-];
-
-const recentActivity = [
-  {
-    id: 1,
-    name: "Julian Vane",
-    action: "booked a",
-    highlight: "Deluxe Facial Treatment",
-    time: "2 minutes ago",
-    initials: "JV",
-    color: "#e0e0e0",
-    iconBg: "#22c55e",
-    iconType: "check",
-  },
-  {
-    id: 2,
-    name: "Sarah Jenkins",
-    action: "joined the",
-    highlight: "Platinum Membership",
-    time: "15 minutes ago",
-    initials: "SJ",
-    color: "#d4a5a5",
-    iconBg: "#4648d4",
-    iconType: "user",
-  },
-  {
-    id: 3,
-    name: "System Alert",
-    action: "High traffic detected on Sunday slots",
-    highlight: null,
-    time: "1 hour ago",
-    initials: "!",
-    color: "#fca5a5",
-    iconBg: "#ef4444",
-    iconType: "alert",
-    isAlert: true,
-  },
-  {
-    id: 4,
-    name: "Marco Rossi",
-    action: "updated his",
-    highlight: "Service Availability",
-    time: "3 hours ago",
-    initials: "MR",
-    color: "#c4a882",
-    iconBg: "#f59e0b",
-    iconType: "star",
-  },
-  {
-    id: 5,
-    name: "Admin",
-    action: "updated Business Hours for the West Wing",
-    highlight: null,
-    time: "5 hours ago",
-    initials: "A",
-    color: "#333",
-    iconBg: "#6b7280",
-    iconType: "settings",
-  },
-];
-
-const stats = [
-  {
-    label: "Total Appointments",
-    value: "2,481",
-    badge: "+12.5%",
-    badgeColor: "#ef4444",
-    icon: "📅",
-    accent: "#4648d4",
-    bgAccent: "#eef0ff",
-  },
-  {
-    label: "Total Customers",
-    value: "1,120",
-    badge: "+8.2%",
-    badgeColor: "#ef4444",
-    icon: "👤",
-    accent: "#f59e0b",
-    bgAccent: "#fffbeb",
-  },
-  {
-    label: "Total Staff",
-    value: "42",
-    badge: "Stable",
-    badgeColor: "#6b7280",
-    icon: "🗂",
-    accent: "#6b7280",
-    bgAccent: "#f3f4f6",
-  },
-  {
-    label: "Total Services",
-    value: "156",
-    badge: "+4 New",
-    badgeColor: "#4648d4",
-    icon: "✂",
-    accent: "#4648d4",
-    bgAccent: "#eef0ff",
-  },
-];
-
 export default function AdminDashboard() {
-  const [bookingView, setBookingView] = useState("Weekly");
+  const navigate = useNavigate();
+  const [analytics, setAnalytics] = useState<any>(null);
+  const [services, setServices] = useState<any[]>([]);
+  const [appointments, setAppointments] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchDashboardData = async () => {
+      try {
+        setLoading(true);
+        const [analyticsRes, servicesRes, appointmentsRes] = await Promise.all([
+          api.get("/admin/analytics"),
+          api.get("/admin/services"),
+          api.get("/admin/appointments"),
+        ]);
+        setAnalytics(analyticsRes.data);
+        setServices(servicesRes.data?.data || servicesRes.data || []);
+        setAppointments(appointmentsRes.data?.data || appointmentsRes.data || []);
+      } catch (err) {
+        console.error("Failed to load dashboard data:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchDashboardData();
+  }, []);
+
+  if (loading || !analytics) {
+    return (
+      <div className="flex-1 p-8 flex justify-center items-center h-[80vh]">
+        <Loader2 className="animate-spin text-indigo-600" size={32} />
+      </div>
+    );
+  }
+
+  const { metrics, monthly_earnings } = analytics;
+
+  // Total bookings across all lifecycles
+  const totalAppointments =
+    metrics.completed_appointments +
+    metrics.confirmed_appointments +
+    metrics.pending_appointments +
+    metrics.cancelled_appointments;
+
+  const stats = [
+    {
+      label: "Total Appointments",
+      value: String(totalAppointments),
+      badge: `+${metrics.completed_appointments} Done`,
+      badgeColor: "#059669",
+      icon: "📅",
+      accent: "#4648d4",
+      bgAccent: "#eef0ff",
+    },
+    {
+      label: "Total Customers",
+      value: String(metrics.total_customers),
+      badge: "Active",
+      badgeColor: "#4648d4",
+      icon: "👤",
+      accent: "#f59e0b",
+      bgAccent: "#fffbeb",
+    },
+    {
+      label: "Total Staff",
+      value: String(metrics.total_staff),
+      badge: "Stable",
+      badgeColor: "#6b7280",
+      icon: "🗂",
+      accent: "#6b7280",
+      bgAccent: "#f3f4f6",
+    },
+    {
+      label: "Total Services",
+      value: String(services.length),
+      badge: `${services.filter((s) => s.is_active).length} Active`,
+      badgeColor: "#059669",
+      icon: "✂",
+      accent: "#10b981",
+      bgAccent: "#ecfdf5",
+    },
+  ];
+
+  // Map Recharts Trend Data
+  const trendData = monthly_earnings.map((me: any) => ({
+    day: me.month,
+    completed: parseFloat(me.total),
+  }));
+
+  // Map recent activities from appointment registrations
+  const recentActivity = appointments.slice(0, 5).map((appt) => {
+    const initials = appt.customer?.name
+      ? appt.customer.name.split(" ").map((n: string) => n[0]).join("").toUpperCase().slice(0, 2)
+      : "C";
+    const statusColors: any = {
+      completed: "#22c55e",
+      confirmed: "#4648d4",
+      pending: "#f59e0b",
+      cancelled: "#ef4444",
+      rejected: "#6b7280",
+    };
+    return {
+      id: appt.id,
+      name: appt.customer?.name || "Customer",
+      action: `scheduled ${appt.service?.name || "service"} with`,
+      highlight: appt.staff?.name || "Specialist",
+      time: `${appt.appointment_date} at ${appt.start_time.substring(0, 5)}`,
+      initials,
+      color: "#eef0fc",
+      iconBg: statusColors[appt.status.toLowerCase()] || "#6b7280",
+      iconType: "check",
+    };
+  });
 
   return (
     <div style={{ padding: "28px 32px", flex: 1 }}>
@@ -134,27 +141,25 @@ export default function AdminDashboard() {
           </p>
         </div>
         <div style={{ display: "flex", gap: 10 }}>
-          {["Last 30 Day", "Export Report"].map((label, i) => (
-            <button
-              key={label}
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: 6,
-                padding: "8px 14px",
-                borderRadius: 8,
-                border: "1px solid #e4e1ed",
-                background: "#fff",
-                color: "#464554",
-                fontSize: 13,
-                cursor: "pointer",
-                fontWeight: 500,
-              }}
-            >
-              <span>{i === 0 ? "📅" : "⬇"}</span>
-              {label}
-            </button>
-          ))}
+          <button
+            onClick={() => navigate("/admin/analytics")}
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: 6,
+              padding: "8px 14px",
+              borderRadius: 8,
+              border: "1px solid #e4e1ed",
+              background: "#fff",
+              color: "#464554",
+              fontSize: 13,
+              cursor: "pointer",
+              fontWeight: 500,
+            }}
+          >
+            <span>📊</span>
+            View Detailed Reports
+          </button>
         </div>
       </div>
 
@@ -221,37 +226,15 @@ export default function AdminDashboard() {
         >
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 20 }}>
             <div>
-              <div style={{ fontWeight: 600, fontSize: 15, color: "#1b1b23" }}>Booking Trends</div>
+              <div style={{ fontWeight: 600, fontSize: 15, color: "#1b1b23" }}>Revenue Trends</div>
               <div style={{ color: "#767586", fontSize: 12, marginTop: 2 }}>
-                Visualizing appointment volume over time
+                Visualizing gross profits and earnings growth
               </div>
-            </div>
-            <div style={{ display: "flex", gap: 0, background: "#f5f2fe", borderRadius: 8, padding: 3 }}>
-              {["Weekly", "Monthly"].map((v) => (
-                <button
-                  key={v}
-                  onClick={() => setBookingView(v)}
-                  style={{
-                    padding: "5px 14px",
-                    borderRadius: 6,
-                    border: "none",
-                    background: bookingView === v ? "#fff" : "transparent",
-                    color: bookingView === v ? "#1b1b23" : "#767586",
-                    fontWeight: bookingView === v ? 600 : 400,
-                    fontSize: 12,
-                    cursor: "pointer",
-                    boxShadow: bookingView === v ? "0 1px 4px rgba(0,0,0,0.08)" : "none",
-                    transition: "all 0.15s",
-                  }}
-                >
-                  {v}
-                </button>
-              ))}
             </div>
           </div>
 
           <ResponsiveContainer width="100%" height={220}>
-            <AreaChart data={bookingData} margin={{ top: 5, right: 5, left: -20, bottom: 0 }}>
+            <AreaChart data={trendData.length > 0 ? trendData : [{ day: "None", completed: 0 }]} margin={{ top: 5, right: 5, left: -20, bottom: 0 }}>
               <defs>
                 <linearGradient id="colorCompleted" x1="0" y1="0" x2="0" y2="1">
                   <stop offset="5%" stopColor="#4648d4" stopOpacity={0.15} />
@@ -266,6 +249,7 @@ export default function AdminDashboard() {
               />
               <YAxis hide />
               <Tooltip
+                formatter={(value) => [`$${value}`, "Gross revenue"]}
                 contentStyle={{
                   background: "#fff",
                   border: "1px solid #e4e1ed",
@@ -285,15 +269,10 @@ export default function AdminDashboard() {
           </ResponsiveContainer>
 
           <div style={{ display: "flex", gap: 20, marginTop: 12 }}>
-            {[
-              { color: "#4648d4", label: "Completed Bookings" },
-              { color: "#c7c4d7", label: "Cancellations" },
-            ].map((l) => (
-              <div key={l.label} style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                <div style={{ width: 10, height: 10, borderRadius: "50%", background: l.color }} />
-                <span style={{ fontSize: 12, color: "#767586" }}>{l.label}</span>
-              </div>
-            ))}
+            <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+              <div style={{ width: 10, height: 10, borderRadius: "50%", background: "#4648d4" }} />
+              <span style={{ fontSize: 12, color: "#767586" }}>Monthly Gross Sales</span>
+            </div>
           </div>
         </div>
 
@@ -309,35 +288,34 @@ export default function AdminDashboard() {
           }}
         >
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
-            <div style={{ fontWeight: 600, fontSize: 15, color: "#1b1b23" }}>Recent Activity</div>
-            <span style={{ fontSize: 12, color: "#4648d4", cursor: "pointer", fontWeight: 500 }}>
+            <div style={{ fontWeight: 600, fontSize: 15, color: "#1b1b23" }}>Recent Bookings</div>
+            <span
+              onClick={() => navigate("/admin/appointments")}
+              style={{ fontSize: 12, color: "#4648d4", cursor: "pointer", fontWeight: 500 }}
+            >
               View All
             </span>
           </div>
 
           <div style={{ display: "flex", flexDirection: "column", gap: 14, flex: 1 }}>
-            {recentActivity.map((item) => (
-              <div key={item.id} style={{ display: "flex", gap: 10, alignItems: "flex-start" }}>
-                <ActivityAvatar item={item} />
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ fontSize: 13, color: "#1b1b23", lineHeight: 1.4 }}>
-                    {item.isAlert ? (
-                      <>
-                        <span style={{ fontWeight: 600 }}>System Alert</span>: {item.action}
-                      </>
-                    ) : (
-                      <>
-                        <span style={{ fontWeight: 600 }}>{item.name}</span> {item.action}{" "}
-                        {item.highlight && (
-                          <span style={{ color: "#4648d4", fontWeight: 500 }}>{item.highlight}</span>
-                        )}
-                      </>
-                    )}
+            {recentActivity.length === 0 ? (
+              <p className="text-xs text-slate-400 text-center py-6">No recent bookings registered.</p>
+            ) : (
+              recentActivity.map((item) => (
+                <div key={item.id} style={{ display: "flex", gap: 10, alignItems: "flex-start" }}>
+                  <ActivityAvatar item={item} />
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ fontSize: 13, color: "#1b1b23", lineHeight: 1.4 }}>
+                      <span style={{ fontWeight: 600 }}>{item.name}</span> {item.action}{" "}
+                      {item.highlight && (
+                        <span style={{ color: "#4648d4", fontWeight: 500 }}>{item.highlight}</span>
+                      )}
+                    </div>
+                    <div style={{ fontSize: 11, color: "#767586", marginTop: 2 }}>{item.time}</div>
                   </div>
-                  <div style={{ fontSize: 11, color: "#767586", marginTop: 2 }}>{item.time}</div>
                 </div>
-              </div>
-            ))}
+              ))
+            )}
           </div>
 
           {/* AI Insight */}
@@ -351,12 +329,12 @@ export default function AdminDashboard() {
             }}
           >
             <div style={{ fontSize: 10, fontWeight: 700, color: "#4648d4", letterSpacing: "0.06em", marginBottom: 6 }}>
-              AI INSIGHT
+              BUSINESS INSIGHT
             </div>
             <div style={{ display: "flex", gap: 8, alignItems: "flex-start" }}>
               <span style={{ fontSize: 16 }}>✦</span>
               <div style={{ fontSize: 12, color: "#464554", lineHeight: 1.5 }}>
-                Rebook rates are up 14% this week. Consider promoting the loyalty program.
+                Total gross revenue registered is ${metrics.total_profit.toLocaleString()} across your styling studio.
               </div>
             </div>
           </div>
@@ -366,12 +344,13 @@ export default function AdminDashboard() {
       {/* Quick actions */}
       <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 16 }}>
         {[
-          { icon: "👥", label: "Search Customers", sub: "Access full database" },
-          { icon: "📋", label: "Revenue Reports", sub: "Download latest P&L" },
-          { icon: "🎚", label: "Global Settings", sub: "Configure environment" },
+          { icon: "👥", label: "Search Customers", sub: "Access full database", path: "/admin/customers" },
+          { icon: "📊", label: "Revenue Reports", sub: "Download latest P&L", path: "/admin/analytics" },
+          { icon: "✂", label: "Manage Services", sub: "Configure wellness options", path: "/admin/services" },
         ].map((action) => (
           <div
             key={action.label}
+            onClick={() => navigate(action.path)}
             style={{
               background: "#fff",
               borderRadius: 12,

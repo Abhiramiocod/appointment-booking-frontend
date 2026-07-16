@@ -15,8 +15,6 @@ export default function QuickActions({ quickActions }: QuickActionsProps) {
   const handleAction = (label: string) => {
     if (label === "Book New") {
       navigate("/customer/book");
-    } else if (label === "Browse Staff") {
-      navigate("/customer/book");
     } else if (label === "My History") {
       navigate("/customer/schedule");
     }

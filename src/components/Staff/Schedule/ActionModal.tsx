@@ -43,8 +43,8 @@ export default function ActionModal({
   rescheduleNote,
   setRescheduleNote,
 }: ActionModalProps) {
-  // Sub-views: 'options' | 'reject' | 'reschedule' | 'cancel'
-  const [subView, setSubView] = useState<"options" | "reject" | "reschedule" | "cancel">("options");
+  // Sub-views: 'options' | 'reject' | 'reschedule' | 'cancel' | 'complete'
+  const [subView, setSubView] = useState<"options" | "reject" | "reschedule" | "cancel" | "complete">("options");
   const [rejectionReason, setLocalRejectionReason] = useState("");
 
   const onApproveClick = async () => {
@@ -122,15 +122,13 @@ export default function ActionModal({
             {isConfirmed ? (
               <>
                 <button
-                  onClick={onCompleteClick}
-                  disabled={confirmingId === appt.id}
+                  onClick={() => setSubView("complete")}
                   className="w-full p-3.5 bg-emerald-50 hover:bg-emerald-100/80 border border-emerald-200/60 rounded-xl text-emerald-800 font-bold text-sm flex items-center justify-between transition-all"
                 >
                   <span className="flex items-center gap-2.5">
                     <CheckCircle2 size={18} className="text-emerald-600" />
                     Complete Appointment
                   </span>
-                  {confirmingId === appt.id ? <Loader2 size={16} className="animate-spin text-emerald-600" /> : null}
                 </button>
 
                 <button
@@ -214,6 +212,34 @@ export default function ActionModal({
               >
                 {confirmingId === appt.id && <Loader2 size={12} className="animate-spin" />}
                 Confirm Cancellation
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* Complete Confirmation View */}
+        {subView === "complete" && (
+          <div className="space-y-4">
+            <p className="text-xs text-slate-500 leading-relaxed">
+              Are you sure you want to mark this appointment as completed?
+            </p>
+
+            <div className="flex justify-end gap-2 border-t border-slate-100 pt-4">
+              <button
+                type="button"
+                onClick={() => setSubView("options")}
+                className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-xs rounded-lg transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={onCompleteClick}
+                disabled={confirmingId === appt.id}
+                className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-xs rounded-lg transition-colors flex items-center gap-1.5 disabled:opacity-50"
+              >
+                {confirmingId === appt.id && <Loader2 size={12} className="animate-spin" />}
+                Complete Appointment
               </button>
             </div>
           </div>

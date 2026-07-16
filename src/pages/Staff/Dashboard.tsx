@@ -1,133 +1,117 @@
+import { useState, useEffect } from "react";
 import {
-  LayoutDashboard,
-  CalendarDays,
-  LayoutGrid,
-  MessageSquareText,
-  Settings,
   CalendarCheck2,
   TrendingUp,
   CheckCircle2,
   Star,
 } from "lucide-react";
-import StaffSidebar from "../../components/Staff/StaffSidebar";
-import StaffTopBar from "../../components/Staff/StaffTopBar";
 import Greeting from "../../components/Staff/Dashboard/Greeting";
 import Stats from "../../components/Staff/Dashboard/Stats";
 import ScheduleTable from "../../components/Staff/Dashboard/ScheduleTable";
 import QuickActions from "../../components/Staff/Dashboard/QuickActions";
 import Reviews from "../../components/Staff/Dashboard/Reviews";
-import MobileNav from "../../components/Staff/Dashboard/MobileNav";
-
-const navItems = [
-  { label: "Dashboard", icon: LayoutDashboard, active: true },
-  { label: "Schedule", icon: CalendarDays },
-  { label: "Services", icon: LayoutGrid },
-  { label: "Reviews", icon: MessageSquareText },
-  { label: "Settings", icon: Settings },
-];
-
-const stats = [
-  {
-    label: "Today's Appointments",
-    value: "8",
-    icon: CalendarCheck2,
-    iconBg: "bg-indigo-100",
-    iconColor: "text-indigo-600",
-  },
-  {
-    label: "Upcoming",
-    value: "24",
-    icon: TrendingUp,
-    iconBg: "bg-blue-100",
-    iconColor: "text-blue-600",
-  },
-  {
-    label: "Completed (Week)",
-    value: "42",
-    icon: CheckCircle2,
-    iconBg: "bg-orange-100",
-    iconColor: "text-orange-600",
-  },
-  {
-    label: "Avg Rating",
-    value: "4.9",
-    suffix: "/5.0",
-    icon: Star,
-    iconBg: "bg-yellow-100",
-    iconColor: "text-yellow-600",
-    fill: true,
-  },
-];
-
-const statusStyles = {
-  Confirmed: "bg-green-100 text-green-700",
-  "In Progress": "bg-indigo-100 text-indigo-600",
-  Pending: "bg-slate-100 text-slate-500",
-};
-
-const schedule = [
-  {
-    time: "09:00 AM",
-    initials: "AR",
-    name: "Alex Rivera",
-    service: "Luxury Hair Spa",
-    status: "Confirmed",
-    avatarBg: "bg-indigo-100",
-    avatarColor: "text-indigo-600",
-  },
-  {
-    time: "10:30 AM",
-    initials: "JH",
-    name: "Jordan Hayes",
-    service: "Styling Session",
-    status: "In Progress",
-    avatarBg: "bg-purple-100",
-    avatarColor: "text-purple-700",
-  },
-  {
-    time: "01:00 PM",
-    initials: "EV",
-    name: "Eleanor Vance",
-    service: "Hair Color",
-    status: "Pending",
-    avatarBg: "bg-blue-100",
-    avatarColor: "text-blue-700",
-  },
-  {
-    time: "02:30 PM",
-    initials: "MR",
-    name: "Marcus Reed",
-    service: "Consultation",
-    status: "Confirmed",
-    avatarBg: "bg-orange-100",
-    avatarColor: "text-orange-700",
-  },
-  {
-    time: "04:00 PM",
-    initials: "SL",
-    name: "Sophia Lin",
-    service: "Premium Grooming",
-    status: "Confirmed",
-    avatarBg: "bg-pink-100",
-    avatarColor: "text-pink-700",
-  },
-];
-
-const reviews = [
-  {
-    name: "Elena R.",
-    rating: 5,
-    quote: "Sarah is amazing! My hair has never looked better.",
-  },
-  {
-    name: "James K.",
-    rating: 5,
-    quote: "Very professional and punctual. Highly recommend.",
-  },
-];
-
+import api from "../../lib/api";
 
 export default function Dashboard() {
+  const [data, setData] = useState<{
+    today_appointments: number;
+    upcoming_appointments: number;
+    completed_this_week: number;
+    average_rating: number;
+  } | null>(null);
+
+  const [appointments, setAppointments] = useState<any[]>([]);
+  const [reviewsList, setReviewsList] = useState<any[]>([]);
+
+  useEffect(() => {
+    api.get("/staff/dashboard")
+      .then((res) => {
+        setData(res.data);
+      })
+      .catch((err) => {
+        console.error("Failed to load dashboard statistics:", err);
+      });
+
+    api.get("/staff/appointments")
+      .then((res) => {
+        setAppointments(res.data?.data || res.data || []);
+      })
+      .catch((err) => {
+        console.error("Failed to load appointments:", err);
+      });
+
+    api.get("/staff/reviews")
+      .then((res) => {
+        setReviewsList(res.data?.reviews?.data || res.data?.reviews || []);
+      })
+      .catch((err) => {
+        console.error("Failed to load reviews:", err);
+      });
+  }, []);
+
+  const stats = [
+    {
+      label: "Today's Appointments",
+      value: data ? String(data.today_appointments) : "...",
+      icon: CalendarCheck2,
+      iconBg: "bg-indigo-100",
+      iconColor: "text-indigo-600",
+    },
+    {
+      label: "Upcoming",
+      value: data ? String(data.upcoming_appointments) : "...",
+      icon: TrendingUp,
+      iconBg: "bg-blue-100",
+      iconColor: "text-blue-600",
+    },
+    {
+      label: "Completed (Week)",
+      value: data ? String(data.completed_this_week) : "...",
+      icon: CheckCircle2,
+      iconBg: "bg-orange-100",
+      iconColor: "text-orange-600",
+    },
+    {
+      label: "Avg Rating",
+      value: data ? String(data.average_rating) : "...",
+      suffix: "/5.0",
+      icon: Star,
+      iconBg: "bg-yellow-100",
+      iconColor: "text-yellow-600",
+      fill: true,
+    },
+  ];
+
+  // Get today's local date string YYYY-MM-DD
+  const todayStr = new Date().toLocaleDateString("en-CA"); // YYYY-MM-DD format in local timezone
+
+  const scheduleRows = appointments
+    .filter((appt) => appt.appointment_date === todayStr)
+    .map((appt) => {
+      const name = appt.customer?.name || "Client";
+      const initials = name
+        .split(" ")
+        .map((n: string) => n[0])
+        .join("")
+        .toUpperCase()
+        .slice(0, 2);
+      return {
+        time: appt.start_time.substring(0, 5),
+        name,
+        initials,
+        avatarBg: "bg-indigo-100",
+        avatarColor: "text-indigo-600",
+        service: appt.service?.name || "Styling Session",
+        status: appt.status,
+      };
+    });
+
+  const recentReviews = reviewsList.slice(0, 2).map((rev) => ({
+    name: rev.customer?.name || "Anonymous",
+    rating: rev.rating,
+    quote: rev.review || "No comment left.",
+  }));
+
   return (
     <div style={{ padding: "28px 32px", flex: 1 }}>
       {/* Greeting */}
@@ -139,7 +123,7 @@ export default function Dashboard() {
       {/* Schedule + sidebar */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
         {/* Schedule */}
-        <ScheduleTable schedule={schedule} />
+        <ScheduleTable schedule={scheduleRows} />
 
         {/* Right column */}
         <div className="lg:col-span-4 space-y-8">
@@ -147,7 +131,7 @@ export default function Dashboard() {
           <QuickActions />
 
           {/* Reviews */}
-          <Reviews reviews={reviews} />
+          <Reviews reviews={recentReviews} />
         </div>
       </div>
     </div>
