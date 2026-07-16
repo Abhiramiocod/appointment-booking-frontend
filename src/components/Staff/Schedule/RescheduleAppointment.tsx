@@ -124,9 +124,9 @@ export default function RescheduleAppointment({
             className="px-4 py-2 text-white font-semibold text-xs rounded-lg transition-colors flex items-center gap-1.5 disabled:opacity-50"
             style={{ background: "linear-gradient(135deg, #4648d4, #6366f1)" }}
           >
-            {submittingReschedule ? (
+            {submittingReschedule && (
               <Loader2 size={12} className="animate-spin" />
-            ) : null}
+            )}
             Send Proposal
           </button>
         </div>

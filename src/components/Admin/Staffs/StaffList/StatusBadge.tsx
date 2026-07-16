@@ -12,6 +12,12 @@ export default function StatusBadge({ status }: { status: string }) {
       bg: "bg-emerald-500/10",
       label: "Active",
     },
+    inactive: {
+      dot: "bg-slate-400",
+      text: "text-slate-500",
+      bg: "bg-slate-400/10",
+      label: "Inactive",
+    },
     on_leave: {
       dot: "bg-amber-500",
       text: "text-amber-600",
@@ -23,6 +29,18 @@ export default function StatusBadge({ status }: { status: string }) {
       text: "text-amber-600",
       bg: "bg-amber-500/10",
       label: "On Break",
+    },
+    terminated: {
+      dot: "bg-rose-500",
+      text: "text-rose-600",
+      bg: "bg-rose-500/10",
+      label: "Terminated",
+    },
+    suspended: {
+      dot: "bg-orange-500",
+      text: "text-orange-600",
+      bg: "bg-orange-500/10",
+      label: "Suspended",
     },
     offline: {
       dot: "bg-slate-400",

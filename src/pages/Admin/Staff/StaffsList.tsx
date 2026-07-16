@@ -4,12 +4,12 @@ import HeaderAndButtons from "../../../components/Admin/Staffs/StaffList/HeaderA
 import KpiCard from "../../../components/Admin/Staffs/StaffList/KpiCard";
 import MainTable from "../../../components/Admin/Staffs/StaffList/MainTable";
 import SidebarPerformanceInsights from "../../../components/Admin/Staffs/StaffList/SidebarPerformanceInsights";
+import StatusModal from "../../../components/Admin/Staffs/StaffRequests/StaffRequestModal/StatusModal";
+import StaffFormModal from "../../../components/Admin/Staffs/StaffList/StaffFormModal";
+import ManageServicesModal from "../../../components/Admin/Staffs/StaffList/ManageServicesModal";
+import Toast from "../../../components/Toast";
 import { Colors } from "../../../lib/utils";
 import api from "../../../lib/api";
-import StatusModal from "../../../components/Admin/Staffs/StaffRequests/StaffRequestModal/StatusModal";
-import Body from "../../../components/Admin/Staffs/StaffRequests/StaffRequestModal/Body";
-
-
 
 const topPerformers = [
   {
@@ -43,50 +43,46 @@ const topPerformers = [
 
 const filters = ["All Staff", "Aestheticians", "Therapists", "Reception"];
 
+// ── Modal type union ───────────────────────────────────────────────────
+type ModalState =
+  | { type: "status"; request: any; currentStatus?: string }
+  | { type: "view"; request: any }
+  | { type: "edit"; request: any }
+  | { type: "add" }
+  | { type: "manage_services"; request: any }
+  | { type: "delete"; request: any }
+  | null;
+
+// ── Toast state ────────────────────────────────────────────────────────
+interface ToastState {
+  type: "success" | "error";
+  message: string;
+}
+
 export default function StaffsList() {
   const [activeFilter, setActiveFilter] = useState("All Staff");
   const [sortBy, setSortBy] = useState("Performance");
 
   const [loading, setLoading] = useState(true);
-  const [staffs, setStaffs] = useState([]);
-  
-  const [modal, setModal] = useState<{
-    type: "status" | "view";
-    request: any;
-    currentStatus?: string;
-  } | null>(null);
-  const [toast, setToast] = useState<string | null>(null);
+  const [staffs, setStaffs] = useState<any[]>([]);
 
-  const updateStatus = async (staff: any, status: string) => {
-    try {
-      await api.patch(`/admin/staff/${staff.id}/status`, { employment_status: status });
-      await fetchStaffs();
-      setModal(null);
-      const labels: Record<string, string> = {
-        active: "Active",
-        inactive: "Inactive",
-        on_leave: "On Leave",
-        terminated: "Terminated",
-      };
-      setToast(`${staff.name}'s status updated to ${labels[status] ?? status}.`);
-      setTimeout(() => setToast(null), 3000);
-    } catch (err) {
-      console.error("Status update failed", err);
-    }
+  const [modal, setModal] = useState<ModalState>(null);
+  const [toast, setToast] = useState<ToastState | null>(null);
+
+  // ── Helpers ─────────────────────────────────────────────────────────
+  const showToast = (message: string, type: "success" | "error" = "success") => {
+    setToast({ type, message });
   };
+
+  const closeModal = () => setModal(null);
 
   const fetchStaffs = async () => {
     try {
       setLoading(true);
-
       const response = await api.get("/admin/staff");
-
-      console.log(response.data);
-      console.log(Array.isArray(response.data.data));
-
-      setStaffs(response.data.data);
+      setStaffs(response.data.data ?? response.data ?? []);
     } catch (error) {
-      console.log(error);
+      console.error(error);
     } finally {
       setLoading(false);
     }
@@ -95,6 +91,90 @@ export default function StaffsList() {
   useEffect(() => {
     fetchStaffs();
   }, []);
+
+  // ── Status update (used by StatusModal) ─────────────────────────────
+  const updateStatus = async (staff: any, status: string) => {
+    try {
+      await api.patch(`/admin/staff/${staff.id}/status`, {
+        employment_status: status,
+      });
+      await fetchStaffs();
+      closeModal();
+      const labels: Record<string, string> = {
+        active: "Active",
+        inactive: "Inactive",
+        on_leave: "On Leave",
+        terminated: "Terminated",
+        suspended: "Suspended",
+      };
+      showToast(
+        `${staff.name}'s status updated to ${labels[status] ?? status}.`
+      );
+    } catch (err) {
+      console.error("Status update failed", err);
+      showToast("Failed to update status. Please try again.", "error");
+    }
+  };
+
+  // ── Delete ──────────────────────────────────────────────────────────
+  const handleDelete = async (staff: any) => {
+    if (
+      !window.confirm(
+        `Are you sure you want to delete ${staff.name}? This action cannot be undone.`
+      )
+    )
+      return;
+    try {
+      await api.delete(`/admin/staff/${staff.id}`);
+      await fetchStaffs();
+      showToast(`${staff.name} has been removed from the staff list.`);
+    } catch (err: any) {
+      console.error("Delete failed", err);
+      showToast(
+        err.response?.data?.message || "Failed to delete staff member.",
+        "error"
+      );
+    }
+  };
+
+  // ── Deactivate (quick shortcut to set inactive) ─────────────────────
+  const handleDeactivate = async (staff: any) => {
+    const currentStatus = staff.profile?.employment_status || staff.status;
+    if (currentStatus === "inactive") {
+      showToast(`${staff.name} is already inactive.`);
+      return;
+    }
+    if (
+      !window.confirm(`Set ${staff.name} to Inactive?`)
+    )
+      return;
+    await updateStatus(staff, "inactive");
+  };
+
+  // ── Modal backdrop ───────────────────────────────────────────────────
+  const Backdrop = ({
+    children,
+    wide = false,
+  }: {
+    children: React.ReactNode;
+    wide?: boolean;
+  }) => (
+    <div
+      className="fixed inset-0 z-[100] flex items-center justify-center p-6"
+      style={{
+        backgroundColor: "rgba(27,27,35,0.25)",
+        backdropFilter: "blur(6px)",
+      }}
+      onClick={closeModal}
+    >
+      <div
+        style={{ width: "100%", maxWidth: wide ? 600 : 480 }}
+        onClick={(e) => e.stopPropagation()}
+      >
+        {children}
+      </div>
+    </div>
+  );
 
   return (
     <div
@@ -108,7 +188,7 @@ export default function StaffsList() {
       <div className="space-y-6">
         {/* Page Header */}
         <div>
-          <HeaderAndButtons />
+          <HeaderAndButtons onAddStaff={() => setModal({ type: "add" })} />
         </div>
 
         {/* KPI Cards */}
@@ -118,7 +198,7 @@ export default function StaffsList() {
             iconBg="rgba(70,72,212,0.1)"
             iconColor={Colors.primary}
             label="Total Staff"
-            value="42"
+            value={String(staffs.length || 0)}
             sublabel="+2 this month"
             sublabelColor="#059669"
           />
@@ -127,7 +207,12 @@ export default function StaffsList() {
             iconBg="rgba(16,185,129,0.1)"
             iconColor="#059669"
             label="Active Now"
-            value="18"
+            value={String(
+              staffs.filter(
+                (s) =>
+                  (s.profile?.employment_status || s.status) === "active"
+              ).length
+            )}
             sublabel="4 on break"
           />
           <KpiCard
@@ -151,6 +236,20 @@ export default function StaffsList() {
             setSortBy={setSortBy}
             staffMembers={staffs}
             setModal={setModal}
+            onEdit={(staff) => setModal({ type: "edit", request: staff })}
+            onManageServices={(staff) =>
+              setModal({ type: "manage_services", request: staff })
+            }
+            onChangeStatus={(staff) =>
+              setModal({
+                type: "status",
+                request: staff,
+                currentStatus:
+                  staff.profile?.employment_status || staff.status || "active",
+              })
+            }
+            onDeactivate={handleDeactivate}
+            onDelete={handleDelete}
           />
 
           {/* Sidebar: Performance Insights */}
@@ -160,19 +259,74 @@ export default function StaffsList() {
         </div>
       </div>
 
-      {modal?.type === "status" && (
+      {/* ── Add Staff Modal ─────────────────────────────────────────── */}
+      {modal?.type === "add" && (
         <div
           className="fixed inset-0 z-[100] flex items-center justify-center p-6"
           style={{
             backgroundColor: "rgba(27,27,35,0.25)",
             backdropFilter: "blur(6px)",
           }}
-          onClick={() => setModal(null)}
+          onClick={closeModal}
         >
-          <StatusModal modal={modal} closeModal={() => setModal(null)} updateStatus={updateStatus} />
+          <StaffFormModal
+            mode="add"
+            onClose={closeModal}
+            onSuccess={(msg) => {
+              closeModal();
+              fetchStaffs();
+              showToast(msg);
+            }}
+          />
         </div>
       )}
 
+      {/* ── Edit Staff Modal ────────────────────────────────────────── */}
+      {modal?.type === "edit" && (
+        <div
+          className="fixed inset-0 z-[100] flex items-center justify-center p-6"
+          style={{
+            backgroundColor: "rgba(27,27,35,0.25)",
+            backdropFilter: "blur(6px)",
+          }}
+          onClick={closeModal}
+        >
+          <StaffFormModal
+            mode="edit"
+            staff={modal.request}
+            onClose={closeModal}
+            onSuccess={(msg) => {
+              closeModal();
+              fetchStaffs();
+              showToast(msg);
+            }}
+          />
+        </div>
+      )}
+
+      {/* ── Manage Services Modal ───────────────────────────────────── */}
+      {modal?.type === "manage_services" && (
+        <div
+          className="fixed inset-0 z-[100] flex items-center justify-center p-6"
+          style={{
+            backgroundColor: "rgba(27,27,35,0.25)",
+            backdropFilter: "blur(6px)",
+          }}
+          onClick={closeModal}
+        >
+          <ManageServicesModal
+            staff={modal.request}
+            onClose={closeModal}
+            onSuccess={(msg) => {
+              closeModal();
+              fetchStaffs();
+              showToast(msg);
+            }}
+          />
+        </div>
+      )}
+
+      {/* ── View Staff Modal ────────────────────────────────────────── */}
       {modal?.type === "view" && (
         <div
           className="fixed inset-0 z-[100] flex items-center justify-center p-6"
@@ -180,70 +334,46 @@ export default function StaffsList() {
             backgroundColor: "rgba(27,27,35,0.25)",
             backdropFilter: "blur(6px)",
           }}
-          onClick={() => setModal(null)}
+          onClick={closeModal}
         >
-          <div
-            className="bg-white rounded-2xl max-w-xl w-full max-h-[90vh] overflow-y-auto shadow-2xl"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="flex justify-between items-center px-6 py-4 border-b border-gray-100">
-              <h3 className="font-bold text-slate-800 text-lg">Staff Member Profile</h3>
-              <button onClick={() => setModal(null)} className="text-slate-400 hover:text-slate-600 font-semibold text-lg">&times;</button>
-            </div>
-            
-            <Body 
-              r={{
-                name: modal.request.name,
-                avatar: modal.request.profile?.profile_photo || modal.request.avatar,
-                role: modal.request.role,
-                designation: modal.request.profile?.designation,
-                experience_years: modal.request.profile?.experience_years,
-                email: modal.request.email,
-                phone: modal.request.profile?.phone,
-                bio: modal.request.profile?.bio
-              }} 
-              tags={[]} 
-              certifications={[]} 
-            />
-
-            <div className="px-6 py-4 border-t border-gray-100 flex justify-end">
-              <button
-                onClick={() => setModal(null)}
-                className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-sm rounded-lg transition-colors"
-              >
-                Close
-              </button>
-            </div>
-          </div>
+          <StaffFormModal
+            mode="view"
+            staff={modal.request}
+            onClose={closeModal}
+            onSuccess={(msg) => {
+              closeModal();
+              fetchStaffs();
+              showToast(msg);
+            }}
+          />
         </div>
       )}
 
-      {/* Toast */}
-      {toast && (
+      {/* ── Change Status Modal ─────────────────────────────────────── */}
+      {modal?.type === "status" && (
         <div
+          className="fixed inset-0 z-[100] flex items-center justify-center p-6"
           style={{
-            position: "fixed",
-            bottom: 28,
-            left: "50%",
-            transform: "translateX(-50%)",
-            zIndex: 300,
-            background: Colors.inverseSurface,
-            color: Colors.inverseOnSurface,
-            padding: "12px 24px",
-            borderRadius: 12,
-            fontSize: 14,
-            fontWeight: 500,
-            boxShadow: "0 8px 32px rgba(0,0,0,0.22)",
-            display: "flex",
-            alignItems: "center",
-            gap: 10,
-            animation: "fadeInUp 0.25s ease",
+            backgroundColor: "rgba(27,27,35,0.25)",
+            backdropFilter: "blur(6px)",
           }}
+          onClick={closeModal}
         >
-          <span style={{ fontSize: 16 }}>✏️</span>
-          {toast}
-          <style>{`@keyframes fadeInUp { from { opacity:0; transform:translate(-50%,12px); } to { opacity:1; transform:translate(-50%,0); } }`}</style>
+          <StatusModal
+            modal={modal}
+            closeModal={closeModal}
+            updateStatus={updateStatus}
+          />
         </div>
+      )}
+
+      {/* ── Toast ──────────────────────────────────────────────────── */}
+      {toast && (
+        <Toast
+          type={toast.type}
+          message={toast.message}
+          onClose={() => setToast(null)}
+        />
       )}
     </div>
   );
