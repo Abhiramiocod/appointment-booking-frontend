@@ -4,7 +4,6 @@ import Footer from "./StaffRequestModal/Footer";
 import RejectModal from "./StaffRequestModal/RejectModal";
 import SuccessToast from "./StaffRequestModal/SucessToast";
 import DeleteModal from "./StaffRequestModal/DeleteModal";
-import StatusModal from "./StaffRequestModal/StatusModal";
 
 interface StaffRequestModalProps {
   modal: {

@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import DayRow from "../../components/Staff/WorkingHours/DayRow";
 import api from "../../lib/api";
 import { Clock, Loader2, RefreshCw, Save } from "lucide-react";
-import { Colors } from "../../lib/utils";
+import Toast from "../../components/Toast";
 
 const DAYS = [
   "Sunday",
@@ -19,6 +19,7 @@ const initialSchedule = DAYS.map((day) => ({
   enabled: day !== "Sunday", // Default: off on Sundays
   start: "09:00",
   end: "17:00",
+  breaks: [] as { start_time: string; end_time: string }[],
 }));
 
 export default function WorkingHours() {
@@ -43,6 +44,10 @@ export default function WorkingHours() {
             enabled: !!match.is_available,
             start: match.start_time ? match.start_time.substring(0, 5) : "09:00",
             end: match.end_time ? match.end_time.substring(0, 5) : "17:00",
+            breaks: match.breaks ? match.breaks.map((b: any) => ({
+              start_time: b.start_time ? b.start_time.substring(0, 5) : "12:00",
+              end_time: b.end_time ? b.end_time.substring(0, 5) : "13:00",
+            })) : [],
           };
         }
         return row;
@@ -77,6 +82,7 @@ export default function WorkingHours() {
         is_available: row.enabled,
         start_time: row.enabled ? row.start : null,
         end_time: row.enabled ? row.end : null,
+        breaks: row.enabled ? row.breaks : [],
       }));
 
       await api.put("/staff/working-hours", {
@@ -98,6 +104,52 @@ export default function WorkingHours() {
     );
   };
 
+  const handleAddBreak = (day: string) => {
+    setSchedule((prev) =>
+      prev.map((row) =>
+        row.day === day
+          ? {
+              ...row,
+              breaks: [...(row.breaks || []), { start_time: "12:00", end_time: "13:00" }],
+            }
+          : row
+      )
+    );
+  };
+
+  const handleRemoveBreak = (day: string, index: number) => {
+    setSchedule((prev) =>
+      prev.map((row) =>
+        row.day === day
+          ? {
+              ...row,
+              breaks: (row.breaks || []).filter((_, i) => i !== index),
+            }
+          : row
+      )
+    );
+  };
+
+  const handleBreakTimeChange = (
+    day: string,
+    index: number,
+    field: "start_time" | "end_time",
+    value: string
+  ) => {
+    setSchedule((prev) =>
+      prev.map((row) =>
+        row.day === day
+          ? {
+              ...row,
+              breaks: (row.breaks || []).map((brk, i) =>
+                i === index ? { ...brk, [field]: value } : brk
+              ),
+            }
+          : row
+      )
+    );
+  };
+
   const resetToDefault = () => {
     setSchedule(initialSchedule);
   };
@@ -113,6 +165,7 @@ export default function WorkingHours() {
         is_available: row.enabled,
         start_time: row.enabled ? row.start : null,
         end_time: row.enabled ? row.end : null,
+        breaks: row.enabled ? row.breaks : [],
       }));
 
       await api.put("/staff/working-hours", {
@@ -180,30 +233,11 @@ export default function WorkingHours() {
 
       {/* Floating Toast */}
       {success && (
-        <div
-          style={{
-            position: "fixed",
-            bottom: 28,
-            left: "50%",
-            transform: "translateX(-50%)",
-            zIndex: 300,
-            background: Colors.inverseSurface,
-            color: Colors.inverseOnSurface,
-            padding: "12px 24px",
-            borderRadius: 12,
-            fontSize: 14,
-            fontWeight: 500,
-            boxShadow: "0 8px 32px rgba(0,0,0,0.22)",
-            display: "flex",
-            alignItems: "center",
-            gap: 10,
-            animation: "fadeInUp 0.25s ease",
-          }}
-        >
-          <span style={{ fontSize: 16 }}>✨</span>
-          {success}
-          <style>{`@keyframes fadeInUp { from { opacity:0; transform:translate(-50%,12px); } to { opacity:1; transform:translate(-50%,0); } }`}</style>
-        </div>
+        <Toast
+          type="success"
+          message={success}
+          onClose={() => setSuccess(null)}
+        />
       )}
 
       {/* Weekly schedule */}
@@ -219,6 +253,9 @@ export default function WorkingHours() {
               row={row}
               onToggle={toggleDay}
               onTimeChange={handleTimeChange}
+              onAddBreak={handleAddBreak}
+              onRemoveBreak={handleRemoveBreak}
+              onBreakTimeChange={handleBreakTimeChange}
             />
           ))}
         </div>

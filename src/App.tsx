@@ -28,7 +28,6 @@ import StaffChangePassword from "./pages/Staff/ChangePassword";
 
 import CustomerLayout from "./layouts/CustomerLayout";
 import CustomerSchedule from "./pages/Customer/Schedule";
-import CustomerServices from "./pages/Customer/Services";
 import CustomerBookAppointment from "./pages/Customer/BookAppointment";
 
 export default function App() {
@@ -69,7 +68,6 @@ export default function App() {
       <Route path="/customer" element={<CustomerLayout />}>
         <Route index element={<CustomerDashboard />} />
         <Route path="schedule" element={<CustomerSchedule />} />
-        <Route path="services" element={<CustomerServices />} />
         <Route path="book" element={<CustomerBookAppointment />} />
       </Route>
 

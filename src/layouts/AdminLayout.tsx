@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Outlet } from "react-router-dom";
+import { Navigate, Outlet } from "react-router-dom";
 import AdminSidebar from "../components/Admin/AdminSidebar";
 import AdminTopbar from "../components/Admin/AdminTopbar";
 
@@ -7,6 +7,24 @@ export default function AdminLayout() {
   const [collapsed, setCollapsed] = useState(() => {
     return localStorage.getItem("sidebar_collapsed") === "true";
   });
+
+  const userString = localStorage.getItem("user");
+  const user = userString ? JSON.parse(userString) : null;
+  const token = localStorage.getItem("token");
+
+  if (!token || !user) {
+    return <Navigate to="/login" replace />;
+  }
+
+  if (user.role !== "admin") {
+    if (user.role === "staff") {
+      return <Navigate to="/staff" replace />;
+    }
+    if (user.role === "customer") {
+      return <Navigate to="/customer" replace />;
+    }
+    return <Navigate to="/login" replace />;
+  }
 
   const toggleSidebar = () => {
     const next = !collapsed;

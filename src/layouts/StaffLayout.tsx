@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Outlet } from "react-router-dom";
+import { Navigate, Outlet } from "react-router-dom";
 import StaffSidebar from "../components/Staff/StaffSidebar";
 import StaffTopBar from "../components/Staff/StaffTopBar";
 
@@ -7,6 +7,24 @@ export default function StaffLayout() {
   const [collapsed, setCollapsed] = useState(() => {
     return localStorage.getItem("sidebar_collapsed") === "true";
   });
+
+  const userString = localStorage.getItem("user");
+  const user = userString ? JSON.parse(userString) : null;
+  const token = localStorage.getItem("token");
+
+  if (!token || !user) {
+    return <Navigate to="/login" replace />;
+  }
+
+  if (user.role !== "staff") {
+    if (user.role === "admin") {
+      return <Navigate to="/admin" replace />;
+    }
+    if (user.role === "customer") {
+      return <Navigate to="/customer" replace />;
+    }
+    return <Navigate to="/login" replace />;
+  }
 
   const toggleSidebar = () => {
     const next = !collapsed;

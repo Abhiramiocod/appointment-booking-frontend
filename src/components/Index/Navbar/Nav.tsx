@@ -39,7 +39,7 @@ export default function Nav({ onLogin, onApplyStaff }: { onLogin: () => void; on
                 </div>
                 <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
                     <NavGhostBtn label="Join as Staff" onClick={onApplyStaff} />
-                    <NavGhostBtn label="Sign Up" onClick={onLogin} />
+                    <NavGhostBtn label="Login" onClick={onLogin} />
                     <NavPrimaryBtn label="Book Now" onClick={onLogin} />
                 </div>
             </div>

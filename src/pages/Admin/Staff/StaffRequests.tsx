@@ -6,6 +6,7 @@ import StaffRequestTable from "../../../components/Admin/Staffs/StaffRequests/St
 import StaffRequestModal from "../../../components/Admin/Staffs/StaffRequests/StaffRequestModal";
 import { Colors } from "../../../lib/utils";
 import api from "../../../lib/api";
+import Toast from "../../../components/Toast";
 
 
 
@@ -199,30 +200,11 @@ export default function StaffRequestsContent() {
 
       {/* Toast */}
       {toast && (
-        <div
-          style={{
-            position: "fixed",
-            bottom: 28,
-            left: "50%",
-            transform: "translateX(-50%)",
-            zIndex: 300,
-            background: Colors.inverseSurface,
-            color: Colors.inverseOnSurface,
-            padding: "12px 24px",
-            borderRadius: 12,
-            fontSize: 14,
-            fontWeight: 500,
-            boxShadow: "0 8px 32px rgba(0,0,0,0.22)",
-            display: "flex",
-            alignItems: "center",
-            gap: 10,
-            animation: "fadeInUp 0.25s ease",
-          }}
-        >
-          <span style={{ fontSize: 16 }}>🗑️</span>
-          {toast}
-          <style>{`@keyframes fadeInUp { from { opacity:0; transform:translate(-50%,12px); } to { opacity:1; transform:translate(-50%,0); } }`}</style>
-        </div>
+        <Toast
+          type="success"
+          message={toast}
+          onClose={() => setToast(null)}
+        />
       )}
     </div>
   );

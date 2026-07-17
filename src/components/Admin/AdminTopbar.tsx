@@ -67,31 +67,6 @@ export default function AdminTopbar() {
           marginLeft: "auto",
         }}
       >
-        <span style={{ color: "#767586", fontSize: 18, cursor: "pointer" }}>
-          🔔
-        </span>
-        <span style={{ color: "#767586", fontSize: 18, cursor: "pointer" }}>
-          🌙
-        </span>
-        <span style={{ color: "#767586", fontSize: 18, cursor: "pointer" }}>
-          ⠿
-        </span>
-        <button
-          style={{
-            padding: "7px 16px",
-            borderRadius: 20,
-            border: "1.5px solid #4648d4",
-            color: "#4648d4",
-            background: "transparent",
-            fontWeight: 600,
-            fontSize: 13,
-            cursor: "pointer",
-            marginRight: 8,
-          }}
-        >
-          Upgrade Plan
-        </button>
-
         {/* User Profile Dropdown */}
         <Menu as="div" className="relative">
           <MenuButton className="flex items-center focus:outline-none">
