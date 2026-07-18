@@ -30,6 +30,8 @@ import CustomerLayout from "./layouts/CustomerLayout";
 import CustomerSchedule from "./pages/Customer/Schedule";
 import CustomerBookAppointment from "./pages/Customer/BookAppointment";
 
+import Notifications from "./pages/Notifications";
+
 export default function App() {
   return (
     <Routes>
@@ -51,6 +53,7 @@ export default function App() {
         <Route path="customers" element={<AdminCustomers />} />
         <Route path="services" element={<AdminServices />} />
         <Route path="analytics" element={<AdminAnalytics />} />
+        <Route path="notifications" element={<Notifications />} />
       </Route>
 
       {/* Staff Routes with Nested Layout */}
@@ -62,6 +65,7 @@ export default function App() {
         <Route path="reviews" element={<StaffReviews />} />
         <Route path="profile" element={<StaffProfile />} />
         <Route path="change-password" element={<StaffChangePassword />} />
+        <Route path="notifications" element={<Notifications />} />
       </Route>
 
       {/* Customer Routes with Nested Layout */}
@@ -69,6 +73,7 @@ export default function App() {
         <Route index element={<CustomerDashboard />} />
         <Route path="schedule" element={<CustomerSchedule />} />
         <Route path="book" element={<CustomerBookAppointment />} />
+        <Route path="notifications" element={<Notifications />} />
       </Route>
 
       {/* 404 */}

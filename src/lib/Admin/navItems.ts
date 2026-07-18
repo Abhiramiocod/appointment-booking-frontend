@@ -16,16 +16,16 @@ export interface NavItem {
 export const navItems: NavItem[] = [
   { label: "Dashboard", icon: LayoutDashboard, path: "/admin" },
   { label: "Appointments", icon: ClipboardClock, path: "/admin/appointments" },
-  { 
-    label: "Staff", 
-    icon: Users, 
+  {
+    label: "Staff",
+    icon: Users,
     path: "/admin/staff",
     children: [
       { label: "Staff List", icon: Users, path: "/admin/staff" },
       { label: "Staff Requests", icon: UserCheck, path: "/admin/staff/requests" }
     ]
   },
-  { label: "Services", icon: Landmark, path: "/admin/services" }, 
-  { label: "Customers", icon: User2Icon, path: "/admin/customers"},
+  { label: "Services", icon: Landmark, path: "/admin/services" },
+  { label: "Customers", icon: User2Icon, path: "/admin/customers" },
   { label: "Analytics", icon: ChartPie, path: "/admin/analytics" },
 ];
