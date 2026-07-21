@@ -1,4 +1,4 @@
-import { LayoutDashboard, ClipboardClock, Landmark, ChartPie, Settings, Users, UserCheck, User2Icon } from 'lucide-react';
+import { LayoutDashboard, ClipboardClock, Landmark, ChartPie, Users, UserCheck, User2Icon } from 'lucide-react';
 
 export interface NavSubItem {
   label: string;

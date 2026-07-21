@@ -20,7 +20,7 @@ interface FinalConfirmationProps {
   selectedService: Service;
   selectedStaff: Staff;
   selectedDate: string;
-  selectedSlot: string;
+  selectedSlot: string | null;
   notes: string;
   setNotes: (notes: string) => void;
 }

@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { MessageSquareText, Star } from "lucide-react";
+import { Star } from "lucide-react";
 
 interface Review {
   name: string;

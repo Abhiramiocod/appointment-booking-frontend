@@ -1,4 +1,4 @@
-import { Clock, User, Scissors, Calendar, MapPin, Eye, Trash2, CalendarPlus } from "lucide-react";
+import { Clock, User, Eye, Trash2, CalendarPlus } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 interface Appointment {

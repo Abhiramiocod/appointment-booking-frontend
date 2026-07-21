@@ -1,4 +1,4 @@
-import { Download, UserPlus } from "lucide-react";
+import { UserPlus } from "lucide-react";
 import { Colors } from "../../../../lib/utils";
 
 interface HeaderAndButtonsProps {

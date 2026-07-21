@@ -69,7 +69,7 @@ export default function ServiceSelect({ filters, onFilterChange, serviceList, se
 
             <Combobox
                 value={filters.service_id}
-                onChange={(value) => onFilterChange("service_id", value)}
+                onChange={(value) => onFilterChange("service_id", value || "")}
                 immediate
             >
                 <div className="relative w-32">

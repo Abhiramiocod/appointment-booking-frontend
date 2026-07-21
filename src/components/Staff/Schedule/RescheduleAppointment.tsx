@@ -17,7 +17,7 @@ interface RescheduleAppointmentProps {
 }
 
 export default function RescheduleAppointment({
-  reschedulingAppt,
+  reschedulingAppt: _reschedulingAppt,
   rescheduleDate,
   setRescheduleDate,
   slotsLoading,

@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { CalendarDays, Coffee } from "lucide-react";
+import { CalendarDays } from "lucide-react";
 
 interface ScheduleRow {
   time: string;

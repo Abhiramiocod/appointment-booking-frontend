@@ -23,7 +23,7 @@ export default function Dashboard() {
 
   const [appointments, setAppointments] = useState<any[]>([]);
   const [reviewsList, setReviewsList] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchDashboardData = async () => {

@@ -1,4 +1,4 @@
-export default function ActivityAvatar({ item }) {
+export default function ActivityAvatar({ item }: { item: any }) {
   return (
     <div style={{ position: "relative", flexShrink: 0 }}>
       <div
