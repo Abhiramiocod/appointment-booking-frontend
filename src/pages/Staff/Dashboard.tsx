@@ -88,7 +88,16 @@ export default function Dashboard() {
     (appt) => appt.appointment_date === todayStr
   );
 
-  const scheduleRows = todayAppointments.map((appt) => {
+  // Sort by created_at descending (latest booked first) and limit to 5
+  const latestTodayAppointments = [...todayAppointments]
+    .sort((a, b) => {
+      const timeA = a.created_at ? new Date(a.created_at).getTime() : a.id;
+      const timeB = b.created_at ? new Date(b.created_at).getTime() : b.id;
+      return timeB - timeA;
+    })
+    .slice(0, 4);
+
+  const scheduleRows = latestTodayAppointments.map((appt) => {
     const name = appt.customer?.name || "Client";
     const initials = name
       .split(" ")

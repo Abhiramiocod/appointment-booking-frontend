@@ -1,4 +1,4 @@
-import { LayoutDashboard, CalendarDays, LayoutGrid, MessageSquareText, Clock} from 'lucide-react';
+import { LayoutDashboard, CalendarDays, LayoutGrid, MessageSquareText, Clock } from 'lucide-react';
 
 export interface NavSubItem {
   label: string;

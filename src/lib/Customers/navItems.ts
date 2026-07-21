@@ -1,4 +1,4 @@
-import { LayoutDashboard, CalendarDays  } from "lucide-react";
+import { LayoutDashboard, CalendarDays } from "lucide-react";
 
 export const navItems = [
   { label: "Dashboard", icon: LayoutDashboard, path: "/customer" },

@@ -143,7 +143,7 @@ export default function CustomerTopbar() {
                   </button>
                 )}
               </div>
-              
+
               <div className="max-h-72 overflow-y-auto divide-y divide-slate-50">
                 {notifications.length === 0 ? (
                   <div className="p-6 text-center text-slate-400 text-xs italic">
@@ -162,9 +162,8 @@ export default function CustomerTopbar() {
                         }
                         setShowNotifications(false);
                       }}
-                      className={`p-3.5 hover:bg-slate-50/50 cursor-pointer transition-colors text-left flex items-start gap-2.5 ${
-                        !item.is_read ? "bg-indigo-50/10" : ""
-                      }`}
+                      className={`p-3.5 hover:bg-slate-50/50 cursor-pointer transition-colors text-left flex items-start gap-2.5 ${!item.is_read ? "bg-indigo-50/10" : ""
+                        }`}
                     >
                       {!item.is_read && (
                         <span className="mt-1.5 w-2 h-2 rounded-full bg-indigo-600 shrink-0" />
@@ -188,6 +187,19 @@ export default function CustomerTopbar() {
                     </div>
                   ))
                 )}
+              </div>
+
+              {/* View all link */}
+              <div className="px-4 py-2 border-t border-slate-100">
+                <button
+                  onClick={() => {
+                    setShowNotifications(false);
+                    navigate("/customer/notifications");
+                  }}
+                  className="w-full text-center text-[11px] font-semibold text-indigo-600 hover:text-indigo-700 hover:underline cursor-pointer py-1"
+                >
+                  View all notifications →
+                </button>
               </div>
             </div>
           )}
