@@ -11,15 +11,15 @@ import Toast from "../../../components/Toast";
 
 
 export default function StaffRequestsContent() {
-  const [requests, setRequests] = useState([]);
+  const [requests, setRequests] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [statusFilter, setStatusFilter] = useState("Pending");
   const [sortBy, setSortBy] = useState("Newest First");
   const [search, setSearch] = useState("");
 
-  // modal state: null | { type: 'view'|'reject'|'success', request }
-  const [modal, setModal] = useState(null);
+  // modal state: null | { type: 'view' | 'reject' | 'success' | 'delete', request: any }
+  const [modal, setModal] = useState<{ type: "view" | "reject" | "success" | "delete"; request: any } | null>(null);
   const [rejectNote, setRejectNote] = useState("");
 
   const closeModal = () => {
@@ -27,7 +27,7 @@ export default function StaffRequestsContent() {
     setRejectNote("");
   };
 
-  const approve = async (request) => {
+  const approve = async (request: any) => {
     try {
       await api.patch(`/admin/staff/requests/${request.id}/approve`);
       await fetchStaffRequests();
@@ -37,7 +37,7 @@ export default function StaffRequestsContent() {
     }
   };
 
-  const confirmReject = async (request) => {
+  const confirmReject = async (request: any) => {
     try {
       await api.patch(`/admin/staff/requests/${request.id}/reject`, {
         note: rejectNote,

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Star, MessageSquare, Loader2, Calendar, User, Award } from "lucide-react";
+import { Star, MessageSquare, Loader2, Calendar, Award } from "lucide-react";
 import api from "../../lib/api";
 
 interface Review {

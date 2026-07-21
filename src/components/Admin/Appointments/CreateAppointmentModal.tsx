@@ -63,21 +63,21 @@ export default function CreateAppointmentModal({
   const [customerResults, setCustomerResults] = useState<Customer[]>([]);
   const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
   const [isSearchingCustomer, setIsSearchingCustomer] = useState(false);
-  const [showCustomerDropdown, setShowCustomerDropdown] = useState(false);
+  const [, setShowCustomerDropdown] = useState(false);
 
   // Staff combobox states
   const [staffSearchQuery, setStaffSearchQuery] = useState("");
   const [selectedStaff, setSelectedStaff] = useState<Staff | null>(null);
-  const [showStaffDropdown, setShowStaffDropdown] = useState(false);
+  const [, setShowStaffDropdown] = useState(false);
 
   // Service combobox states
   const [serviceSearchQuery, setServiceSearchQuery] = useState("");
   const [selectedService, setSelectedService] = useState<Service | null>(null);
-  const [showServiceDropdown, setShowServiceDropdown] = useState(false);
+  const [, setShowServiceDropdown] = useState(false);
 
   // Status combobox states
   const [statusSearchQuery, setStatusSearchQuery] = useState("Confirmed");
-  const [showStatusDropdown, setShowStatusDropdown] = useState(false);
+  const [, setShowStatusDropdown] = useState(false);
 
   // Fetch staff and services on open
   useEffect(() => {

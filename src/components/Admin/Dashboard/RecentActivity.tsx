@@ -53,7 +53,7 @@ export default function RecentActivity({
             No recent bookings registered.
           </p>
         ) : (
-          recentActivity.map((item) => (
+          recentActivity.map((item: any) => (
             <div
               key={item.id}
               style={{ display: "flex", gap: 10, alignItems: "flex-start" }}
