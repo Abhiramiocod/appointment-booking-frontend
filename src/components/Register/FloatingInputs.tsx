@@ -1,4 +1,3 @@
-import { Colors } from "../../lib/utils";
 
 type FloatingInputProps = {
     id: string;

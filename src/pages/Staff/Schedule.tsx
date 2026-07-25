@@ -63,7 +63,7 @@ export default function Schedule() {
 
         const response = await api.get(`/customer/staff/${currentUser.id}/available-slots`, {
           params: {
-            service_id: selectedAppt.service.id,
+            service_id: selectedAppt.service?.id,
             date: rescheduleDate,
           },
         });

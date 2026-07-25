@@ -33,7 +33,7 @@ export default function StaffsList() {
   const [activeFilter, setActiveFilter] = useState("All Staff");
   const [sortBy, setSortBy] = useState("Performance");
 
-  const [loading, setLoading] = useState(true);
+  const [, setLoading] = useState(true);
   const [staffs, setStaffs] = useState<any[]>([]);
 
   const [modal, setModal] = useState<ModalState>(null);
@@ -41,7 +41,10 @@ export default function StaffsList() {
   const [topPerformers, setTopPerformers] = useState<any[]>([]);
 
   // ── Helpers ─────────────────────────────────────────────────────────
-  const showToast = (message: string, type: "success" | "error" = "success") => {
+  const showToast = (
+    message: string,
+    type: "success" | "error" = "success",
+  ) => {
     setToast({ type, message });
   };
 
@@ -51,21 +54,30 @@ export default function StaffsList() {
     try {
       const response = await api.get("/admin/analytics");
       const rawPerformers = response.data?.staff_performance || [];
-      const badgeColors = ["#fbbf24", "#e2e8f0", "#fed7aa", "#f1f5f9", "#f1f5f9"];
+      const badgeColors = [
+        "#fbbf24",
+        "#e2e8f0",
+        "#fed7aa",
+        "#f1f5f9",
+        "#f1f5f9",
+      ];
       const mapped = rawPerformers.map((item: any, index: number) => {
         const rating = item.rating || 5.0;
         const satisfaction = Math.round(rating * 20);
         const revVal = parseFloat(item.revenue) || 0;
-        const revenueFormatted = revVal >= 1000 
-          ? `$${(revVal / 1000).toFixed(1)}k` 
-          : `$${revVal.toFixed(0)}`;
+        const revenueFormatted =
+          revVal >= 1000
+            ? `$${(revVal / 1000).toFixed(1)}k`
+            : `$${revVal.toFixed(0)}`;
 
         return {
           rank: index + 1,
           name: item.name,
           satisfaction,
           revenue: revenueFormatted,
-          avatar: item.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(item.name)}&background=4648d4&color=fff`,
+          avatar:
+            item.avatar ||
+            `https://ui-avatars.com/api/?name=${encodeURIComponent(item.name)}&background=4648d4&color=fff`,
           badgeColor: badgeColors[index] || "#f1f5f9",
         };
       });
@@ -109,7 +121,7 @@ export default function StaffsList() {
         suspended: "Suspended",
       };
       showToast(
-        `${staff.name}'s status updated to ${labels[status] ?? status}.`
+        `${staff.name}'s status updated to ${labels[status] ?? status}.`,
       );
     } catch (err) {
       console.error("Status update failed", err);
@@ -121,7 +133,7 @@ export default function StaffsList() {
   const handleDelete = async (staff: any) => {
     if (
       !window.confirm(
-        `Are you sure you want to delete ${staff.name}? This action cannot be undone.`
+        `Are you sure you want to delete ${staff.name}? This action cannot be undone.`,
       )
     )
       return;
@@ -134,7 +146,7 @@ export default function StaffsList() {
       console.error("Delete failed", err);
       showToast(
         err.response?.data?.message || "Failed to delete staff member.",
-        "error"
+        "error",
       );
     }
   };
@@ -146,10 +158,7 @@ export default function StaffsList() {
       showToast(`${staff.name} is already inactive.`);
       return;
     }
-    if (
-      !window.confirm(`Set ${staff.name} to Inactive?`)
-    )
-      return;
+    if (!window.confirm(`Set ${staff.name} to Inactive?`)) return;
     await updateStatus(staff, "inactive");
   };
 
@@ -211,9 +220,8 @@ export default function StaffsList() {
             label="Active Now"
             value={String(
               staffs.filter(
-                (s) =>
-                  (s.profile?.employment_status || s.status) === "active"
-              ).length
+                (s) => (s.profile?.employment_status || s.status) === "active",
+              ).length,
             )}
             sublabel="4 on break"
           />
@@ -263,14 +271,7 @@ export default function StaffsList() {
 
       {/* ── Add Staff Modal ─────────────────────────────────────────── */}
       {modal?.type === "add" && (
-        <div
-          className="fixed inset-0 z-[100] flex items-center justify-center p-6"
-          style={{
-            backgroundColor: "rgba(27,27,35,0.25)",
-            backdropFilter: "blur(6px)",
-          }}
-          onClick={closeModal}
-        >
+        <Backdrop>
           <StaffFormModal
             mode="add"
             onClose={closeModal}
@@ -281,19 +282,12 @@ export default function StaffsList() {
               showToast(msg);
             }}
           />
-        </div>
+        </Backdrop>
       )}
 
       {/* ── Edit Staff Modal ────────────────────────────────────────── */}
       {modal?.type === "edit" && (
-        <div
-          className="fixed inset-0 z-[100] flex items-center justify-center p-6"
-          style={{
-            backgroundColor: "rgba(27,27,35,0.25)",
-            backdropFilter: "blur(6px)",
-          }}
-          onClick={closeModal}
-        >
+        <Backdrop>
           <StaffFormModal
             mode="edit"
             staff={modal.request}
@@ -305,19 +299,12 @@ export default function StaffsList() {
               showToast(msg);
             }}
           />
-        </div>
+        </Backdrop>
       )}
 
       {/* ── Manage Services Modal ───────────────────────────────────── */}
       {modal?.type === "manage_services" && (
-        <div
-          className="fixed inset-0 z-[100] flex items-center justify-center p-6"
-          style={{
-            backgroundColor: "rgba(27,27,35,0.25)",
-            backdropFilter: "blur(6px)",
-          }}
-          onClick={closeModal}
-        >
+        <Backdrop wide>
           <ManageServicesModal
             staff={modal.request}
             onClose={closeModal}
@@ -328,19 +315,12 @@ export default function StaffsList() {
               showToast(msg);
             }}
           />
-        </div>
+        </Backdrop>
       )}
 
       {/* ── View Staff Modal ────────────────────────────────────────── */}
       {modal?.type === "view" && (
-        <div
-          className="fixed inset-0 z-[100] flex items-center justify-center p-6"
-          style={{
-            backgroundColor: "rgba(27,27,35,0.25)",
-            backdropFilter: "blur(6px)",
-          }}
-          onClick={closeModal}
-        >
+        <Backdrop>
           <StaffFormModal
             mode="view"
             staff={modal.request}
@@ -352,25 +332,18 @@ export default function StaffsList() {
               showToast(msg);
             }}
           />
-        </div>
+        </Backdrop>
       )}
 
       {/* ── Change Status Modal ─────────────────────────────────────── */}
       {modal?.type === "status" && (
-        <div
-          className="fixed inset-0 z-[100] flex items-center justify-center p-6"
-          style={{
-            backgroundColor: "rgba(27,27,35,0.25)",
-            backdropFilter: "blur(6px)",
-          }}
-          onClick={closeModal}
-        >
+        <Backdrop>
           <StatusModal
             modal={modal}
             closeModal={closeModal}
             updateStatus={updateStatus}
           />
-        </div>
+        </Backdrop>
       )}
 
       {/* ── Toast ──────────────────────────────────────────────────── */}

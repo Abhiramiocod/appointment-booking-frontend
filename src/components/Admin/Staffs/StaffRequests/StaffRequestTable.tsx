@@ -3,7 +3,6 @@ import {
   ChevronLeft,
   ChevronRight,
   Eye,
-  Settings2,
   XCircle,
 } from "lucide-react";
 import { Colors } from "../../../../lib/utils";

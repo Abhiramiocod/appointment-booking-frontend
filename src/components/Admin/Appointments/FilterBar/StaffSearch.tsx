@@ -83,7 +83,7 @@ export default function StaffSearch({ filters, onFilterChange, searchStaff }: St
 
         <Combobox
             value={filters.staff_id}
-            onChange={(value) => onFilterChange("staff_id", value)}
+            onChange={(value) => onFilterChange("staff_id", value || "")}
             immediate
         >
             <div className="relative w-38">

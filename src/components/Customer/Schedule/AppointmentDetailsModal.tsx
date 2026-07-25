@@ -1,4 +1,4 @@
-import { X, CalendarDays, Clock, User, Scissors, Star, AlignLeft, Info } from "lucide-react";
+import { X, CalendarDays, User, Scissors, Star, AlignLeft, Info } from "lucide-react";
 
 interface Appointment {
   id: number;

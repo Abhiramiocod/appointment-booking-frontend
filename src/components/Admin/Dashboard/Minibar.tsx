@@ -1,4 +1,4 @@
-export default function MiniBar({ accent }) {
+export default function MiniBar({ accent }: { accent: string }) {
   const heights = [20, 30, 25, 45, 35, 50, 65];
   return (
     <div

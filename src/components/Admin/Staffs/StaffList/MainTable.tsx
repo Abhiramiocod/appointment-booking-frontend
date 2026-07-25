@@ -2,10 +2,8 @@ import { useEffect, useRef, useState } from "react";
 import {
   Eye,
   Pencil,
-  Scissors,
   MoreVertical,
   Activity,
-  UserX,
   Trash2,
 } from "lucide-react";
 import { Colors } from "../../../../lib/utils";
@@ -135,12 +133,12 @@ function ServiceChips({ services }: { services: any[] }) {
 import { createPortal } from "react-dom";
 
 function ActionsMenu({
-  staff,
+  staff: _staff,
   onView,
   onEdit,
-  onManageServices,
+  onManageServices: _onManageServices,
   onChangeStatus,
-  onDeactivate,
+  onDeactivate: _onDeactivate,
   onDelete,
 }: {
   staff: any;
@@ -259,11 +257,11 @@ function ActionsMenu({
 
 /* ── Main component ──────────────────────────────────────────────────── */
 export default function MainTable({
-  filters,
-  activeFilter,
-  setActiveFilter,
-  sortBy,
-  setSortBy,
+  filters: _filters,
+  activeFilter: _activeFilter,
+  setActiveFilter: _setActiveFilter,
+  sortBy: _sortBy,
+  setSortBy: _setSortBy,
   staffMembers,
   setModal,
   onEdit,
