@@ -92,7 +92,14 @@ export default function RightSection({ handleSubmit, status, name, username, ema
 
                             {/* Social buttons */}
                             <div className="social-row" style={{ display: "flex", gap: 12 }}>
-                                <button type="button" className="btn-social">
+                                <button
+                                    type="button"
+                                    className="btn-social"
+                                    onClick={() => {
+                                        const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:8000/api";
+                                        window.location.href = `${apiUrl}/auth/google/redirect`;
+                                    }}
+                                >
                                     <img
                                         alt="Google"
                                         src={googleIcon}

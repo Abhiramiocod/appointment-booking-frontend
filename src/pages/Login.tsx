@@ -1,3 +1,4 @@
+import { useSearchParams } from "react-router-dom";
 import { useCallback, useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import DesignColors from "../lib/utils";
@@ -11,12 +12,21 @@ import api from "../lib/api";
 
 export default function Login() {
     const navigate = useNavigate();
+    const [searchParams] = useSearchParams();
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [showPass, setShowPass] = useState(false);
     const [mousePos, setMousePos] = useState({ x: 50, y: 50 });
     const [emailFocus, setEmailFocus] = useState(false);
     const [passFocus, setPassFocus] = useState(false);
+    const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
+    useEffect(() => {
+        const errorParam = searchParams.get("error");
+        if (errorParam) {
+            setErrorMessage(errorParam);
+        }
+    }, [searchParams]);
 
     const onBack = useCallback(() => {
         navigate("/");
@@ -118,6 +128,27 @@ export default function Login() {
                         gap: 24,
                     }}
                 >
+                    {errorMessage && (
+                        <div
+                            style={{
+                                padding: "12px 16px",
+                                borderRadius: "12px",
+                                backgroundColor: "rgba(220, 38, 38, 0.1)",
+                                border: "1px solid rgba(220, 38, 38, 0.25)",
+                                color: "#dc2626",
+                                fontSize: "14px",
+                                display: "flex",
+                                alignItems: "center",
+                                gap: "8px",
+                            }}
+                        >
+                            <span className="material-symbols-outlined" style={{ fontSize: 20 }}>
+                                error
+                            </span>
+                            <span>{errorMessage}</span>
+                        </div>
+                    )}
+
                     {/* Social buttons */}
                     <SocialLogin />
 
