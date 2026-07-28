@@ -4,16 +4,20 @@ import DesignColors from "../../lib/utils";
 interface SocialButtonProps {
   label: string;
   src: string;
+  onClick?: () => void;
 }
 
 export default function SocialButton({
   label,
   src,
+  onClick,
 }: SocialButtonProps) {
   const [hovered, setHovered] = useState(false);
 
   return (
     <button
+      type="button"
+      onClick={onClick}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
       style={{

@@ -2,6 +2,7 @@ import { Navigate, Route, Routes } from "react-router-dom";
 
 import Index from "./pages/Index";
 import Login from "./pages/Login";
+import LoginCallback from "./pages/LoginCallback";
 
 import AdminLayout from "./layouts/AdminLayout";
 import AdminDashboard from "./pages/Admin/Dashboard";
@@ -38,6 +39,7 @@ export default function App() {
       {/* Public Routes */}
       <Route path="/" element={<Index />} />
       <Route path="/login" element={<Login />} />
+      <Route path="/login/callback" element={<LoginCallback />} />
       <Route path="/register" element={<Register />} />
 
       {/* Admin Routes with Nested Layout */}
