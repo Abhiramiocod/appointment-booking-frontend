@@ -100,15 +100,20 @@ export default function LoginCallback() {
           </button>
         </div>
       ) : (
-        <div style={{ textAlign: "center" }}>
-          <span
-            className="material-symbols-outlined spin"
-            style={{ fontSize: 48, color: DesignColors().primary, marginBottom: 16 }}
-          >
-            progress_activity
-          </span>
-          <p style={{ fontSize: 16, fontWeight: 500 }}>Completing Google sign-in...</p>
+        <div style={{ textAlign: "center", display: "flex", flexDirection: "column", alignItems: "center", gap: 16 }}>
+          <div
+            style={{
+              width: 44,
+              height: 44,
+              borderRadius: "50%",
+              border: `3px solid rgba(70, 72, 212, 0.15)`,
+              borderTopColor: DesignColors().primary,
+              animation: "spin 0.8s linear infinite",
+            }}
+          />
+          <p style={{ fontSize: 16, fontWeight: 500 }}>Completing sign-in...</p>
         </div>
+
       )}
     </div>
   );

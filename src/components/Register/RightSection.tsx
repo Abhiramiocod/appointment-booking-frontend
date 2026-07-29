@@ -1,6 +1,6 @@
 import { Colors } from "../../lib/utils";
 import googleIcon from "../../assets/images/google.webp";
-import appleIcon from "../../assets/images/apple.svg";
+import microsoftIcon from "../../assets/images/microsoftlogo.png"
 import FloatingInput from "./FloatingInputs";
 import PasswordInput from "./PasswordInputs";
 import { Link } from "react-router-dom";
@@ -109,11 +109,11 @@ export default function RightSection({ handleSubmit, status, name, username, ema
                                 </button>
                                 <button type="button" className="btn-social">
                                     <img
-                                        alt="Apple"
-                                        src={appleIcon}
+                                        alt="Microsoft"
+                                        src={microsoftIcon}
                                         style={{ width: 18, height: 18 }}
                                     />
-                                    Apple
+                                    Microsoft
                                 </button>
                             </div>
                         </form>
