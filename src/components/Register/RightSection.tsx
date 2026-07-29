@@ -107,7 +107,14 @@ export default function RightSection({ handleSubmit, status, name, username, ema
                                     />
                                     Google
                                 </button>
-                                <button type="button" className="btn-social">
+                                <button
+                                    type="button"
+                                    className="btn-social"
+                                    onClick={() => {
+                                        const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:8000/api";
+                                        window.location.href = `${apiUrl}/auth/microsoft/redirect`;
+                                    }}
+                                >
                                     <img
                                         alt="Microsoft"
                                         src={microsoftIcon}
@@ -115,6 +122,7 @@ export default function RightSection({ handleSubmit, status, name, username, ema
                                     />
                                     Microsoft
                                 </button>
+
                             </div>
                         </form>
 

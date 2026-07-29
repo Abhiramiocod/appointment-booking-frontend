@@ -76,11 +76,18 @@ export default function Login() {
                 default:
                     navigate("/");
             }
-        } catch (error) {
+        } catch (error: any) {
             console.error(error);
-            // Show error toast/message
+            if (error.response?.status === 403) {
+                navigate("/verify-email", { state: { email } });
+            } else if (error.response?.data?.message) {
+                setErrorMessage(error.response.data.message);
+            } else {
+                setErrorMessage("Invalid credentials. Please try again.");
+            }
         }
     };
+
 
     const bgStyle: React.CSSProperties = {
         minHeight: "100vh",

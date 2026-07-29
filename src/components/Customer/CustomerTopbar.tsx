@@ -25,7 +25,23 @@ export default function CustomerTopbar() {
     }
   };
 
+  const [currentUser, setCurrentUser] = useState<any>(user);
+
   useEffect(() => {
+    // Fetch fresh user profile on mount
+    api
+      .get("/user")
+      .then((res) => {
+        const u = res.data?.user;
+        if (u) {
+          setCurrentUser(u);
+          localStorage.setItem("user", JSON.stringify(u));
+        }
+      })
+      .catch((err) =>
+        console.error("Failed to fetch fresh user in Topbar", err),
+      );
+
     fetchNotifications();
     const interval = setInterval(fetchNotifications, 15000); // Poll every 15s
     return () => clearInterval(interval);
@@ -55,7 +71,8 @@ export default function CustomerTopbar() {
     navigate("/");
   };
 
-  const userImageUrl = user?.image ?? "";
+  const [imgError, setImgError] = useState(false);
+  const userImageUrl = !imgError && currentUser?.image ? currentUser.image : "";
 
   return (
     <header
@@ -133,7 +150,9 @@ export default function CustomerTopbar() {
           {showNotifications && (
             <div className="absolute right-0 mt-2 w-80 bg-white rounded-2xl border border-slate-100 shadow-xl z-50 overflow-hidden animate-scale-in">
               <div className="px-4 py-3 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
-                <span className="text-sm font-bold text-slate-800">Notifications</span>
+                <span className="text-sm font-bold text-slate-800">
+                  Notifications
+                </span>
                 {unreadCount > 0 && (
                   <button
                     onClick={handleMarkAllAsRead}
@@ -162,26 +181,32 @@ export default function CustomerTopbar() {
                         }
                         setShowNotifications(false);
                       }}
-                      className={`p-3.5 hover:bg-slate-50/50 cursor-pointer transition-colors text-left flex items-start gap-2.5 ${!item.is_read ? "bg-indigo-50/10" : ""
-                        }`}
+                      className={`p-3.5 hover:bg-slate-50/50 cursor-pointer transition-colors text-left flex items-start gap-2.5 ${
+                        !item.is_read ? "bg-indigo-50/10" : ""
+                      }`}
                     >
                       {!item.is_read && (
                         <span className="mt-1.5 w-2 h-2 rounded-full bg-indigo-600 shrink-0" />
                       )}
                       <div className="flex-1 min-w-0">
-                        <p className={`text-xs font-semibold text-slate-800 ${!item.is_read ? "font-bold" : ""}`}>
+                        <p
+                          className={`text-xs font-semibold text-slate-800 ${!item.is_read ? "font-bold" : ""}`}
+                        >
                           {item.title}
                         </p>
                         <p className="text-[11px] text-slate-500 mt-0.5 leading-normal">
                           {item.message}
                         </p>
                         <p className="text-[9px] text-slate-400 mt-1">
-                          {new Date(item.created_at).toLocaleDateString(undefined, {
-                            month: "short",
-                            day: "numeric",
-                            hour: "2-digit",
-                            minute: "2-digit",
-                          })}
+                          {new Date(item.created_at).toLocaleDateString(
+                            undefined,
+                            {
+                              month: "short",
+                              day: "numeric",
+                              hour: "2-digit",
+                              minute: "2-digit",
+                            },
+                          )}
                         </p>
                       </div>
                     </div>
@@ -207,8 +232,7 @@ export default function CustomerTopbar() {
 
         {/* User Profile Dropdown */}
         <Menu as="div" className="relative">
-          <MenuButton
-            className="flex items-center gap-3 px-3 py-1.5 rounded-xl cursor-pointer transition-all duration-200 hover:bg-slate-50 border border-transparent hover:border-slate-200/80 active:bg-slate-100 focus:outline-none">
+          <MenuButton className="flex items-center gap-3 px-3 py-1.5 rounded-xl cursor-pointer transition-all duration-200 hover:bg-slate-50 border border-transparent hover:border-slate-200/80 active:bg-slate-100 focus:outline-none">
             <div style={{ textAlign: "right" }}>
               <div
                 style={{
@@ -217,38 +241,30 @@ export default function CustomerTopbar() {
                   color: "#1e1b4b",
                 }}
               >
-                {user?.name || "Customer User"}
+                {currentUser?.name || "Customer User"}
               </div>
             </div>
 
             {userImageUrl ? (
               <img
                 src={userImageUrl}
-                alt={user?.name || "User avatar"}
+                alt={currentUser?.name || "User avatar"}
                 width={40}
                 height={40}
                 className="w-10 h-10 rounded-full object-cover object-center border-2 border-gray-200 hover:border-indigo-500 transition-all duration-200"
                 loading="eager"
                 draggable={false}
-                onError={(e) => {
-                  e.currentTarget.style.display = "none";
-                  const sibling = e.currentTarget
-                    .nextElementSibling as HTMLElement;
-                  if (sibling) sibling.style.display = "flex";
-                }}
+                onError={() => setImgError(true)}
               />
-            ) : null}
-
-            <div
-              className="w-10 h-10 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-700 font-semibold border-2 border-indigo-200"
-              style={{ display: userImageUrl ? "none" : "flex" }}
-            >
-              {user?.name ? (
-                user.name.charAt(0).toUpperCase()
-              ) : (
-                <UserIcon size={18} />
-              )}
-            </div>
+            ) : (
+              <div className="w-10 h-10 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-700 font-semibold border-2 border-indigo-200">
+                {currentUser?.name ? (
+                  currentUser.name.charAt(0).toUpperCase()
+                ) : (
+                  <UserIcon size={18} />
+                )}
+              </div>
+            )}
           </MenuButton>
 
           <MenuItems
@@ -261,10 +277,10 @@ export default function CustomerTopbar() {
                 Signed in as
               </p>
               <p className="text-sm font-semibold text-gray-800 truncate">
-                {user?.name || "Customer User"}
+                {currentUser?.name || "Customer User"}
               </p>
               <p className="text-xs text-gray-500 truncate">
-                {user?.email || ""}
+                {currentUser?.email || ""}
               </p>
             </div>
 

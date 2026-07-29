@@ -1,6 +1,8 @@
+import { Link } from "react-router-dom";
 import DesignColors from "../../lib/utils";
 import Icon from "./Icons";
 import SignInButton from "./SignInButton";
+
 
 type LoginFormProps = {
     email: string;
@@ -90,9 +92,10 @@ export default function LoginForm({
                     >
                         Password
                     </label>
-                    <a href="#" style={{ color: DesignColors().primary, fontSize: 14, fontWeight: 500, textDecoration: "none" }}>
+                    <Link to="/forgot-password" style={{ color: DesignColors().primary, fontSize: 14, fontWeight: 500, textDecoration: "none" }}>
                         Forgot?
-                    </a>
+                    </Link>
+
                 </div>
                 <div style={{ position: "relative" }}>
                     <input

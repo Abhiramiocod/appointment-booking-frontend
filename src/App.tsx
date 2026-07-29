@@ -3,8 +3,13 @@ import { Navigate, Route, Routes } from "react-router-dom";
 import Index from "./pages/Index";
 import Login from "./pages/Login";
 import LoginCallback from "./pages/LoginCallback";
+import ForgotPassword from "./pages/ForgotPassword";
+import ResetPassword from "./pages/ResetPassword";
+import VerifyEmail from "./pages/VerifyEmail";
+import VerifySuccess from "./pages/VerifySuccess";
 
 import AdminLayout from "./layouts/AdminLayout";
+
 import AdminDashboard from "./pages/Admin/Dashboard";
 import AdminAppointments from "./pages/Admin/Appointments";
 import AdminStaff from "./pages/Admin/Staff/StaffsList";
@@ -41,6 +46,11 @@ export default function App() {
       <Route path="/login" element={<Login />} />
       <Route path="/login/callback" element={<LoginCallback />} />
       <Route path="/register" element={<Register />} />
+      <Route path="/forgot-password" element={<ForgotPassword />} />
+      <Route path="/reset-password" element={<ResetPassword />} />
+      <Route path="/verify-email" element={<VerifyEmail />} />
+      <Route path="/verify-success" element={<VerifySuccess />} />
+
 
       {/* Admin Routes with Nested Layout */}
       <Route path="/admin" element={<AdminLayout />}>

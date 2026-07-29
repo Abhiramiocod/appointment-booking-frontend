@@ -33,10 +33,11 @@ export default function RegisterPage() {
             localStorage.setItem("token", token);
             localStorage.setItem("user", JSON.stringify(user));
 
-            // Redirect to customer dashboard
-            navigate("/customer");
+            // Local user needs email verification -> redirect to /verify-email
+            navigate("/verify-email", { state: { email } });
         } catch (error: any) {
             console.error(error);
+
 
             if (error.response?.data?.errors) {
                 console.log(error.response.data.errors); // Laravel validation errors
