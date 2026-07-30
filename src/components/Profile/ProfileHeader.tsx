@@ -1,4 +1,4 @@
-import React, { useRef } from "react";
+import { useRef } from "react";
 import { Camera, Trash2, CheckCircle2, AlertCircle, Sparkles } from "lucide-react";
 import googleLogo from "../../assets/images/google.webp";
 import microsoftLogo from "../../assets/images/microsoftlogo.png";

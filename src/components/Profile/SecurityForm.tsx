@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Eye, EyeOff, Lock, ExternalLink, ShieldCheck, KeyRound, CheckCircle2, Sparkles } from "lucide-react";
+import { Eye, EyeOff, Lock, ExternalLink, ShieldCheck, KeyRound, CheckCircle2 } from "lucide-react";
 import googleLogo from "../../assets/images/google.webp";
 import microsoftLogo from "../../assets/images/microsoftlogo.png";
 import PasswordStrength from "./PasswordStrength";

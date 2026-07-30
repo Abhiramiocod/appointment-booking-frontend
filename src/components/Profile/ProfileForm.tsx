@@ -1,5 +1,5 @@
 import React from "react";
-import { User, Mail, Phone, Calendar, MapPin, Globe, Award, Briefcase, FileText, HeartPulse } from "lucide-react";
+import { User, MapPin, Briefcase, HeartPulse } from "lucide-react";
 
 interface ProfileFormProps {
   user: any;

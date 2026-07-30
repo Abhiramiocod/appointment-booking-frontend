@@ -1,5 +1,4 @@
-import React from "react";
-import { User, ShieldCheck, Mail, Calendar, CheckCircle2, AlertCircle, Sparkles } from "lucide-react";
+import { CheckCircle2 } from "lucide-react";
 
 interface SidebarProps {
   user: any;

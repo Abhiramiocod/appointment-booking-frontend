@@ -1,4 +1,3 @@
-import React from "react";
 import { User, ShieldCheck } from "lucide-react";
 
 interface ProfileTabsProps {
