@@ -79,13 +79,21 @@ export default function Login() {
         } catch (error: any) {
             console.error(error);
             if (error.response?.status === 403) {
-                navigate("/verify-email", { state: { email } });
+                const data = error.response.data;
+                if (data?.token) {
+                    localStorage.setItem("token", data.token);
+                }
+                if (data?.user) {
+                    localStorage.setItem("user", JSON.stringify(data.user));
+                }
+                navigate("/verify-email", { state: { email: data?.user?.email || email } });
             } else if (error.response?.data?.message) {
                 setErrorMessage(error.response.data.message);
             } else {
                 setErrorMessage("Invalid credentials. Please try again.");
             }
         }
+
     };
 
 

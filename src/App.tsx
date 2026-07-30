@@ -38,6 +38,8 @@ import CustomerBookAppointment from "./pages/Customer/BookAppointment";
 
 import Notifications from "./pages/Notifications";
 
+import ProfilePage from "./pages/ProfilePage";
+
 export default function App() {
   return (
     <Routes>
@@ -51,13 +53,10 @@ export default function App() {
       <Route path="/verify-email" element={<VerifyEmail />} />
       <Route path="/verify-success" element={<VerifySuccess />} />
 
-
       {/* Admin Routes with Nested Layout */}
       <Route path="/admin" element={<AdminLayout />}>
         <Route index element={<AdminDashboard />} />
-
         <Route path="appointments" element={<AdminAppointments />} />
-
         <Route path="staff">
           <Route index element={<AdminStaff />} />
           <Route path="requests" element={<AdminStaffRequests />} />
@@ -65,6 +64,7 @@ export default function App() {
         <Route path="customers" element={<AdminCustomers />} />
         <Route path="services" element={<AdminServices />} />
         <Route path="analytics" element={<AdminAnalytics />} />
+        <Route path="profile" element={<ProfilePage />} />
         <Route path="notifications" element={<Notifications />} />
       </Route>
 
@@ -75,7 +75,7 @@ export default function App() {
         <Route path="working-hours" element={<StaffWorkingHours />} />
         <Route path="services" element={<StaffServices />} />
         <Route path="reviews" element={<StaffReviews />} />
-        <Route path="profile" element={<StaffProfile />} />
+        <Route path="profile" element={<ProfilePage />} />
         <Route path="change-password" element={<StaffChangePassword />} />
         <Route path="notifications" element={<Notifications />} />
       </Route>
@@ -85,8 +85,10 @@ export default function App() {
         <Route index element={<CustomerDashboard />} />
         <Route path="schedule" element={<CustomerSchedule />} />
         <Route path="book" element={<CustomerBookAppointment />} />
+        <Route path="profile" element={<ProfilePage />} />
         <Route path="notifications" element={<Notifications />} />
       </Route>
+
 
       {/* 404 */}
       <Route path="*" element={<Navigate to="/" replace />} />

@@ -262,6 +262,18 @@ export default function AdminTopbar() {
               </p>
             </div>
 
+            <div className="p-1 border-b border-gray-50">
+              <MenuItem>
+                <button
+                  onClick={() => navigate("/admin/profile")}
+                  className="group flex w-full items-center gap-2 rounded-lg py-2 px-2.5 text-sm text-slate-700 hover:bg-indigo-50 hover:text-indigo-600 transition-colors cursor-pointer text-left font-medium"
+                >
+                  <UserIcon size={16} />
+                  My Profile
+                </button>
+              </MenuItem>
+            </div>
+
             <div className="p-1">
               <MenuItem>
                 <button
@@ -273,6 +285,7 @@ export default function AdminTopbar() {
                 </button>
               </MenuItem>
             </div>
+
           </MenuItems>
         </Menu>
       </div>
