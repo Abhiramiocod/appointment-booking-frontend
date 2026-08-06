@@ -1,4 +1,4 @@
-import { LayoutDashboard, ClipboardClock, Landmark, ChartPie, Users, UserCheck, User2Icon } from 'lucide-react';
+import { LayoutDashboard, ClipboardClock, Landmark, ChartPie, Users, UserCheck, User2Icon, Link2 } from 'lucide-react';
 
 export interface NavSubItem {
   label: string;
@@ -28,4 +28,5 @@ export const navItems: NavItem[] = [
   { label: "Services", icon: Landmark, path: "/admin/services" },
   { label: "Customers", icon: User2Icon, path: "/admin/customers" },
   { label: "Analytics", icon: ChartPie, path: "/admin/analytics" },
+  { label: "Connections", icon: Link2, path: "/admin/connections" },
 ];

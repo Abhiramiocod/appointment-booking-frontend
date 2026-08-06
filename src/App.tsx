@@ -41,6 +41,7 @@ const CustomerBookAppointment = lazy(() => import("./pages/Customer/BookAppointm
 // Shared Pages
 const Notifications = lazy(() => import("./pages/Notifications"));
 const ProfilePage = lazy(() => import("./pages/ProfilePage"));
+const ConnectionsPage = lazy(() => import("./pages/ConnectionsPage"));
 
 export default function App() {
   return (
@@ -67,6 +68,7 @@ export default function App() {
           <Route path="customers" element={<AdminCustomers />} />
           <Route path="services" element={<AdminServices />} />
           <Route path="analytics" element={<AdminAnalytics />} />
+          <Route path="connections" element={<ConnectionsPage />} />
           <Route path="profile" element={<ProfilePage />} />
           <Route path="notifications" element={<Notifications />} />
         </Route>
@@ -78,6 +80,7 @@ export default function App() {
           <Route path="working-hours" element={<StaffWorkingHours />} />
           <Route path="services" element={<StaffServices />} />
           <Route path="reviews" element={<StaffReviews />} />
+          <Route path="connections" element={<ConnectionsPage />} />
           <Route path="profile" element={<ProfilePage />} />
           <Route path="change-password" element={<StaffChangePassword />} />
           <Route path="notifications" element={<Notifications />} />
@@ -88,6 +91,7 @@ export default function App() {
           <Route index element={<CustomerDashboard />} />
           <Route path="schedule" element={<CustomerSchedule />} />
           <Route path="book" element={<CustomerBookAppointment />} />
+          <Route path="connections" element={<ConnectionsPage />} />
           <Route path="profile" element={<ProfilePage />} />
           <Route path="notifications" element={<Notifications />} />
         </Route>
