@@ -13,8 +13,11 @@ import ScheduleSelection from "../../components/Customer/BookAppointment/Schedul
 import FinalConfirmation from "../../components/Customer/BookAppointment/FinalConfirmation";
 import BookingSummary from "../../components/Customer/BookAppointment/BookingSummary";
 import StepperFooter from "../../components/Customer/BookAppointment/StepperFooter";
+import { processRazorpayPayment } from "../../lib/razorpay";
+
 
 interface Service {
+
   id: number;
   name: string;
   price: string;
@@ -138,13 +141,15 @@ export default function BookAppointment() {
   }, [selectedStaff, selectedDate, selectedService]);
 
   const handleBook = async () => {
+
     if (!selectedService || !selectedStaff || !selectedDate || !selectedSlot)
       return;
     setBooking(true);
     setError(null);
 
     try {
-      await api.post("/customer/appointments", {
+      // Create appointment first
+      const apptRes = await api.post("/customer/appointments", {
         service_id: selectedService.id,
         staff_id: selectedStaff.id,
         appointment_date: selectedDate,
@@ -152,20 +157,52 @@ export default function BookAppointment() {
         notes,
       });
 
-      setSuccess("Appointment booked successfully!");
-      setTimeout(() => {
-        navigate("/customer/schedule");
-      }, 2000);
+      const appointment = apptRes.data?.data || apptRes.data;
+      const priceNum = parseFloat(selectedService.price) || 100;
+      const totalAmountWithTax = priceNum * 1.08;
+      const amountInPaise = Math.max(Math.round(totalAmountWithTax * 100), 100);
+
+
+      const userStr = localStorage.getItem("user");
+      const currentUser = userStr ? JSON.parse(userStr) : null;
+
+      // Launch Razorpay Payment Modal
+      await processRazorpayPayment({
+        amountInPaise,
+        appointmentId: appointment?.id,
+        description: `Payment for ${selectedService.name}`,
+        userInfo: {
+          name: currentUser?.name,
+          email: currentUser?.email,
+          contact: currentUser?.phone || currentUser?.contact || "9999999999",
+        },
+
+        onSuccess: () => {
+
+          setSuccess("Appointment booked & Payment verified successfully!");
+          setTimeout(() => {
+            navigate("/customer/schedule");
+          }, 2000);
+        },
+        onFailure: (errMessage) => {
+          setError(errMessage || "Payment failed or was cancelled.");
+          setBooking(false);
+        },
+        onDismiss: () => {
+          setError("Payment cancelled. Your appointment is pending payment.");
+          setBooking(false);
+        },
+      });
     } catch (err: any) {
       console.error(err);
       setError(
         err.response?.data?.message ||
           "Failed to book appointment. Please try again.",
       );
-    } finally {
       setBooking(false);
     }
   };
+
 
   return (
     <div style={{ padding: "28px 32px", flex: 1, width: "100%" }}>

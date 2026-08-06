@@ -49,8 +49,9 @@ export default function FinalConfirmation({
           </label>
           <p className="font-bold text-slate-800 text-sm mb-1">{selectedService.name}</p>
           <p className="text-slate-500">
-            {selectedService.duration} Min • ${selectedService.price}
+            {selectedService.duration} Min • ₹{selectedService.price}
           </p>
+
         </div>
         <div>
           <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2">

@@ -51,7 +51,7 @@ export default function BookingSummary({
             </p>
             <p className="text-[10px] text-slate-400">
               {selectedService
-                ? `${selectedService.duration} Min • $${selectedService.price}`
+                ? `${selectedService.duration} Min • ₹${selectedService.price}`
                 : "—"}
             </p>
           </div>
@@ -94,24 +94,25 @@ export default function BookingSummary({
         <div className="flex justify-between items-center mb-2 text-xs">
           <span className="text-slate-500">Service Fee</span>
           <span className="font-bold text-slate-800">
-            {selectedService ? `$${parseFloat(selectedService.price).toFixed(2)}` : "$0.00"}
+            {selectedService ? `₹${parseFloat(selectedService.price).toFixed(2)}` : "₹0.00"}
           </span>
         </div>
         <div className="flex justify-between items-center mb-6 text-xs">
           <span className="text-slate-500">Luxury Tax (8%)</span>
           <span className="font-bold text-slate-800">
-            {selectedService ? `$${(parseFloat(selectedService.price) * 0.08).toFixed(2)}` : "$0.00"}
+            {selectedService ? `₹${(parseFloat(selectedService.price) * 0.08).toFixed(2)}` : "₹0.00"}
           </span>
         </div>
         <div className="flex justify-between items-end border-t border-slate-100 pt-4">
           <span className="text-sm font-bold text-slate-800">Total</span>
           <span className="text-2xl font-bold text-indigo-600 leading-none">
             {selectedService
-              ? `$${(parseFloat(selectedService.price) * 1.08).toFixed(2)}`
-              : "$0.00"}
+              ? `₹${(parseFloat(selectedService.price) * 1.08).toFixed(2)}`
+              : "₹0.00"}
           </span>
         </div>
       </div>
+
     </div>
   );
 }
