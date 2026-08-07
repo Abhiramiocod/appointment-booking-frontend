@@ -12,8 +12,9 @@ export const getGoogleCalendarStatus = async (): Promise<GoogleCalendarStatus> =
 };
 
 export const getGoogleCalendarConnectUrl = (): string => {
-  const backendUrl = import.meta.env.VITE_API_BASE_URL || "http://localhost:8000/api";
-  return `${backendUrl}/calendar/google/connect`;
+  const backendUrl = import.meta.env.VITE_API_BASE_URL || "http://127.0.0.1:8000/api";
+  const token = localStorage.getItem("token");
+  return `${backendUrl}/calendar/google/connect${token ? `?bearer_token=${token}` : ""}`;
 };
 
 export const disconnectGoogleCalendar = async (): Promise<{ message: string }> => {

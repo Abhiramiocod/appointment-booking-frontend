@@ -33,7 +33,7 @@ export default function CustomerLayout() {
   };
 
   return (
-    <div style={{ display: "flex", minHeight: "100vh", background: "#f5f2fe", fontFamily: "Inter, sans-serif" }}>
+    <div style={{ display: "flex", minHeight: "100vh", background: "#FAF9F6", fontFamily: "Inter, sans-serif" }}>
       <CustomerSidebar collapsed={collapsed} onToggle={toggleSidebar} />
       <main
         style={{
