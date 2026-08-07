@@ -63,7 +63,7 @@ export default function ProfileHeader({
                 alt={user?.name || "User Avatar"}
                 referrerPolicy="no-referrer"
                 className="w-full h-full object-cover"
-                onError={(e) => {
+                onError={(_e) => {
                   console.warn("ProfileHeader avatar image failed to load:", displayAvatar);
                 }}
               />

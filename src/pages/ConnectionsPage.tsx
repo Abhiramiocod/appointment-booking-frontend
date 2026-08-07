@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import api from "../lib/api";
 import {
   Loader2,
-  Calendar,
   Video,
   Cloud,
   Users,

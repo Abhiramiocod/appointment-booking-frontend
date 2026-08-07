@@ -34,12 +34,12 @@ interface Appointment {
 }
 
 const statusStyles: Record<string, string> = {
-  confirmed: "bg-emerald-50 text-emerald-700 border border-emerald-200/50",
-  pending: "bg-indigo-50 text-indigo-600 border border-indigo-200/50",
-  completed: "bg-blue-50 text-blue-700 border border-blue-200/50",
-  cancelled: "bg-slate-100 text-slate-600 border border-slate-200/50",
-  rejected: "bg-rose-50 text-rose-700 border border-rose-200/50",
-  reschedule_requested: "bg-amber-50 text-amber-700 border border-amber-200/50",
+  confirmed: "bg-emerald-50 text-emerald-700 border border-emerald-200/70",
+  pending: "bg-amber-50 text-amber-700 border border-amber-200/70",
+  completed: "bg-blue-50 text-blue-700 border border-blue-200/70",
+  cancelled: "bg-rose-50 text-rose-700 border border-rose-200/70",
+  rejected: "bg-rose-50 text-rose-700 border border-rose-200/70",
+  reschedule_requested: "bg-amber-50 text-amber-700 border border-amber-200/70",
 };
 
 const getMonthAbbr = (dateStr: string) => {
@@ -115,7 +115,26 @@ export default function Schedule() {
     setTimeout(() => setSuccess(null), 3000);
   };
 
-  // Filter criteria matching Feature 5 sections
+  // Calculate badge counts
+  const allCount = appointments.length;
+  const upcomingCount = appointments.filter((a) => {
+    const s = a.status.toLowerCase();
+    return s === "pending" || s === "confirmed" || s === "reschedule_requested";
+  }).length;
+  const completedCount = appointments.filter((a) => a.status.toLowerCase() === "completed").length;
+  const cancelledCount = appointments.filter((a) => {
+    const s = a.status.toLowerCase();
+    return s === "cancelled" || s === "rejected";
+  }).length;
+
+  const filterTabs = [
+    { id: "All", label: "All", count: allCount },
+    { id: "Upcoming", label: "Upcoming", count: upcomingCount },
+    { id: "Completed", label: "Completed", count: completedCount },
+    { id: "Cancelled", label: "Cancelled", count: cancelledCount },
+  ];
+
+  // Filter criteria matching tabs
   const filtered = appointments.filter((appt) => {
     const statusLower = appt.status.toLowerCase();
     if (activeFilter === "All") return true;
@@ -125,32 +144,34 @@ export default function Schedule() {
     if (activeFilter === "Completed") {
       return statusLower === "completed";
     }
-    if (activeFilter === "Cancelled / Rejected") {
+    if (activeFilter === "Cancelled") {
       return statusLower === "cancelled" || statusLower === "rejected";
     }
     return true;
   });
 
   return (
-    <div style={{ padding: "28px 32px", flex: 1, width: "100%" }}>
+    <div className="font-sans antialiased text-slate-800" style={{ padding: "28px 32px", flex: 1, width: "100%", maxWidth: "1400px", margin: "0 auto" }}>
       {/* Header */}
       <Header />
 
       {/* Message alerts */}
       {error && (
-        <div className="mb-4 p-3 bg-red-50 border border-red-200/60 text-red-700 text-xs rounded-lg">
-          ⚠️ {error}
+        <div className="mb-4 p-3.5 bg-rose-50 border border-rose-200/80 text-rose-700 text-xs font-semibold rounded-xl flex items-center gap-2">
+          <span>⚠️</span>
+          <span>{error}</span>
         </div>
       )}
 
       {success && (
-        <div className="mb-4 p-3 bg-emerald-50 border border-emerald-200/60 text-emerald-700 text-xs rounded-lg">
-          ✨ {success}
+        <div className="mb-4 p-3.5 bg-emerald-50 border border-emerald-200/80 text-emerald-700 text-xs font-semibold rounded-xl flex items-center gap-2">
+          <span>✨</span>
+          <span>{success}</span>
         </div>
       )}
 
-      {/* Filters */}
-      <FilterBar activeFilter={activeFilter} setActiveFilter={setActiveFilter} />
+      {/* Filters with badge counts */}
+      <FilterBar activeFilter={activeFilter} setActiveFilter={setActiveFilter} filters={filterTabs} />
 
       {/* Appointments list */}
       <AppointmentList

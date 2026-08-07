@@ -1,4 +1,4 @@
-import { Clock, Loader2 } from "lucide-react";
+import { Clock, Loader2, CheckCircle2, Sparkles } from "lucide-react";
 
 interface Service {
   id: number;
@@ -26,40 +26,64 @@ export default function Service({
   return (
     <div className="space-y-6">
       {loading ? (
-        <div className="flex justify-center py-12">
-          <Loader2 className="animate-spin text-indigo-600" />
+        <div className="flex justify-center py-16">
+          <Loader2 className="animate-spin text-blue-600" size={32} />
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {services.map((srv) => (
-            <div
-              key={srv.id}
-              onClick={() => {
-                setSelectedService(srv);
-                setStep(2);
-              }}
-              className={`bg-white border rounded-3xl p-6 hover:shadow-lg hover:ring-2 hover:ring-indigo-600/20 cursor-pointer transition-all ${
-                selectedService?.id === srv.id
-                  ? "ring-2 ring-indigo-600 border-indigo-600"
-                  : "border-slate-200/80"
-              }`}
-            >
-              <div className="flex justify-between items-start mb-6">
-                <div className="w-14 h-14 rounded-2xl bg-indigo-50 flex items-center justify-center text-indigo-600">
-                  <span className="material-symbols-outlined text-3xl">spa</span>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+          {services.map((srv) => {
+            const isSelected = selectedService?.id === srv.id;
+
+            return (
+              <div
+                key={srv.id}
+                onClick={() => {
+                  setSelectedService(srv);
+                  setStep(2);
+                }}
+                className={`border rounded-2xl p-6 cursor-pointer transition-all duration-200 relative group flex flex-col justify-between ${
+                  isSelected
+                    ? "bg-blue-50/60 border-blue-600 shadow-md ring-1 ring-blue-600"
+                    : "bg-white hover:bg-slate-50/80 border-slate-200/80 hover:border-blue-300 hover:shadow-sm"
+                }`}
+              >
+                {isSelected && (
+                  <div className="absolute top-4 right-4 text-blue-600 bg-white rounded-full p-0.5 shadow-xs">
+                    <CheckCircle2 size={22} className="fill-blue-600 text-white" />
+                  </div>
+                )}
+
+                <div>
+                  <div className="flex justify-between items-start mb-5">
+                    <div
+                      className={`w-12 h-12 rounded-xl flex items-center justify-center transition-all ${
+                        isSelected
+                          ? "bg-blue-600 text-white"
+                          : "bg-blue-50 text-blue-600 border border-blue-100 group-hover:bg-blue-600 group-hover:text-white"
+                      }`}
+                    >
+                      <Sparkles size={20} />
+                    </div>
+                    <span className="text-lg font-extrabold text-blue-600 bg-blue-50/90 px-3 py-1 rounded-xl border border-blue-100/80">
+                      ${srv.price}
+                    </span>
+                  </div>
+
+                  <h3 className="text-base font-extrabold text-slate-900 mb-1.5 group-hover:text-blue-600 transition-colors">
+                    {srv.name}
+                  </h3>
+                  <p className="text-slate-500 text-xs leading-relaxed mb-5 line-clamp-2">
+                    {srv.description || "Professional wellness session."}
+                  </p>
                 </div>
-                <span className="text-xl font-bold text-indigo-600">${srv.price}</span>
+
+                <div className="flex items-center gap-1.5 text-slate-500 text-xs font-semibold pt-3 border-t border-slate-100">
+                  <Clock size={13} className="text-slate-400" />
+                  <span>{srv.duration} Minutes</span>
+                </div>
               </div>
-              <h3 className="text-lg font-bold text-slate-800 mb-2">{srv.name}</h3>
-              <p className="text-slate-500 text-xs leading-relaxed mb-6">
-                {srv.description || "Premium wellness package."}
-              </p>
-              <div className="flex items-center gap-1.5 text-slate-400 text-[10px] font-bold uppercase tracking-wider">
-                <Clock size={12} />
-                <span>{srv.duration} Min</span>
-              </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
     </div>

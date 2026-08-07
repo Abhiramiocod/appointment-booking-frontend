@@ -129,7 +129,30 @@ export default function BookAppointment() {
             },
           },
         );
-        setSlots(response.data?.data || response.data || []);
+        let rawSlots: string[] = response.data?.data || response.data || [];
+
+        // If selected date is TODAY, block/filter out time slots that have already passed
+        const todayStr = new Date().toISOString().split("T")[0];
+        if (selectedDate === todayStr) {
+          const now = new Date();
+          const currentHour = now.getHours();
+          const currentMinute = now.getMinutes();
+
+          rawSlots = rawSlots.filter((slot) => {
+            // slot is in format "HH:MM" or "HH:MM:SS"
+            const parts = slot.split(":");
+            if (parts.length >= 2) {
+              const slotHour = parseInt(parts[0], 10);
+              const slotMinute = parseInt(parts[1], 10);
+
+              if (slotHour < currentHour) return false;
+              if (slotHour === currentHour && slotMinute <= currentMinute) return false;
+            }
+            return true;
+          });
+        }
+
+        setSlots(rawSlots);
       } catch (err: any) {
         console.error(err);
         setError("Failed to load available time slots.");
@@ -251,51 +274,53 @@ export default function BookAppointment() {
           </div>
 
           {/* Wizard Step Content */}
-          {/* Step 1: Service */}
-          {step === 1 && (
-            <ServiceSelection
-              loading={loading}
-              services={services}
-              selectedService={selectedService}
-              setSelectedService={setSelectedService}
-              setStep={setStep}
-            />
-          )}
+          <div key={step} className="animate-scale-in transition-all">
+            {/* Step 1: Service */}
+            {step === 1 && (
+              <ServiceSelection
+                loading={loading}
+                services={services}
+                selectedService={selectedService}
+                setSelectedService={setSelectedService}
+                setStep={setStep}
+              />
+            )}
 
-          {/* Step 2: Staff */}
-          {step === 2 && (
-            <StaffSelection
-              loading={loading}
-              staffList={staffList}
-              selectedStaff={selectedStaff}
-              setSelectedStaff={setSelectedStaff}
-              setStep={setStep}
-            />
-          )}
+            {/* Step 2: Staff */}
+            {step === 2 && (
+              <StaffSelection
+                loading={loading}
+                staffList={staffList}
+                selectedStaff={selectedStaff}
+                setSelectedStaff={setSelectedStaff}
+                setStep={setStep}
+              />
+            )}
 
-          {/* Step 3: Date & Slots */}
-          {step === 3 && (
-            <ScheduleSelection
-              selectedDate={selectedDate}
-              setSelectedDate={setSelectedDate}
-              slotsLoading={slotsLoading}
-              slots={slots}
-              selectedSlot={selectedSlot}
-              setSelectedSlot={setSelectedSlot}
-            />
-          )}
+            {/* Step 3: Date & Slots */}
+            {step === 3 && (
+              <ScheduleSelection
+                selectedDate={selectedDate}
+                setSelectedDate={setSelectedDate}
+                slotsLoading={slotsLoading}
+                slots={slots}
+                selectedSlot={selectedSlot}
+                setSelectedSlot={setSelectedSlot}
+              />
+            )}
 
-          {/* Step 4: Final Confirmation */}
-          {step === 4 && selectedService && selectedStaff && (
-            <FinalConfirmation
-              selectedService={selectedService}
-              selectedStaff={selectedStaff}
-              selectedDate={selectedDate}
-              selectedSlot={selectedSlot}
-              notes={notes}
-              setNotes={setNotes}
-            />
-          )}
+            {/* Step 4: Final Confirmation */}
+            {step === 4 && selectedService && selectedStaff && (
+              <FinalConfirmation
+                selectedService={selectedService}
+                selectedStaff={selectedStaff}
+                selectedDate={selectedDate}
+                selectedSlot={selectedSlot}
+                notes={notes}
+                setNotes={setNotes}
+              />
+            )}
+          </div>
 
           {/* Stepper Footer Controls */}
           <StepperFooter

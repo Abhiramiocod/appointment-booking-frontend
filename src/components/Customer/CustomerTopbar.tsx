@@ -102,33 +102,6 @@ export default function CustomerTopbar() {
         zIndex: 5,
       }}
     >
-      {/* Search */}
-      <div
-        style={{
-          flex: 1,
-          maxWidth: 480,
-          display: "flex",
-          alignItems: "center",
-          gap: 8,
-          background: "#f5f2fe",
-          border: "1px solid #e4e1ed",
-          borderRadius: 10,
-          padding: "8px 14px",
-        }}
-      >
-        <span style={{ color: "#767586", fontSize: 14 }}>🔍</span>
-        <input
-          style={{
-            border: "none",
-            background: "transparent",
-            outline: "none",
-            fontSize: 13,
-            color: "#464554",
-            flex: 1,
-          }}
-          placeholder="Search appointments, services..."
-        />
-      </div>
 
       <div
         style={{
@@ -269,7 +242,7 @@ export default function CustomerTopbar() {
                 className="w-10 h-10 rounded-full object-cover object-center border-2 border-gray-200 hover:border-indigo-500 transition-all duration-200"
                 loading="eager"
                 draggable={false}
-                onError={(e) => {
+                onError={(_e) => {
                   console.warn("Topbar avatar image failed to load:", userImageUrl);
                   setImgError(true);
                 }}

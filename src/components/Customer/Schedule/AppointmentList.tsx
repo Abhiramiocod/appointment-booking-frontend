@@ -1,4 +1,4 @@
-import { Clock, Loader2, Trash2, Eye, Star } from "lucide-react";
+import { Clock, Loader2, Trash2, Eye, Star, User, Calendar } from "lucide-react";
 
 interface Appointment {
   id: number;
@@ -53,120 +53,130 @@ export default function AppointmentList({
     <>
       {loading ? (
         <div className="flex justify-center py-20">
-          <Loader2 className="animate-spin text-indigo-600" size={28} />
+          <Loader2 className="animate-spin text-blue-600" size={32} />
         </div>
       ) : (
-        <div className="space-y-3.5">
+        <div className="space-y-4">
           {filtered.length > 0 ? (
             filtered.map((appt) => {
-              const isInactive = appt.status.toLowerCase() === "completed" || appt.status.toLowerCase() === "cancelled" || appt.status.toLowerCase() === "rejected";
-              const showCancelBtn = appt.status.toLowerCase() === "pending" || appt.status.toLowerCase() === "confirmed";
-              const isCompleted = appt.status.toLowerCase() === "completed";
+              const statusLower = appt.status.toLowerCase();
+              const isCompleted = statusLower === "completed";
+              const isCancelled = statusLower === "cancelled" || statusLower === "rejected";
+              const isUpcoming = statusLower === "pending" || statusLower === "confirmed" || statusLower === "reschedule_requested";
               const isReviewed = !!appt.review;
 
               return (
                 <div
                   key={appt.id}
-                  className={`bg-white p-4.5 rounded-xl border border-slate-200/80 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4 transition-all hover:shadow-md ${
-                    isInactive ? "opacity-90 bg-slate-50/50" : ""
+                  className={`bg-white/90 backdrop-blur-xl p-5 sm:p-6 rounded-2xl border border-slate-200/80 shadow-sm flex flex-col lg:flex-row lg:items-center justify-between gap-5 transition-all hover:shadow-md hover:border-slate-300 ${
+                    isCancelled ? "opacity-85 bg-slate-50/60" : ""
                   }`}
                 >
-                  <div className="flex items-center gap-4">
+                  <div className="flex items-start sm:items-center gap-4.5">
                     <div
-                      className={`w-14 h-14 rounded-xl flex flex-col items-center justify-center shrink-0 border ${
-                        isInactive
-                          ? "bg-slate-100 text-slate-500 border-slate-200/50"
-                          : "bg-indigo-50/70 text-indigo-600 border-indigo-100/50"
+                      className={`w-14 h-14 rounded-2xl flex flex-col items-center justify-center shrink-0 border shadow-2xs ${
+                        isCancelled
+                          ? "bg-slate-100 text-slate-500 border-slate-200/60"
+                          : "bg-gradient-to-br from-blue-50 to-indigo-50 text-blue-600 border-blue-100/80"
                       }`}
                     >
-                      <span className="text-[10px] font-bold tracking-wider leading-none mb-1">
+                      <span className="text-[10px] font-extrabold tracking-wider leading-none mb-1 uppercase">
                         {getMonthAbbr(appt.appointment_date)}
                       </span>
-                      <span className="text-lg font-extrabold leading-none">
+                      <span className="text-xl font-extrabold leading-none">
                         {getDayNum(appt.appointment_date)}
                       </span>
                     </div>
-                    <div>
-                      <h4 className="font-bold text-slate-800 text-sm leading-snug">
-                        {appt.service?.name || "Styling Session"}
-                      </h4>
-                      <p className="text-xs text-slate-500 mt-1 flex flex-wrap items-center gap-x-2 gap-y-1">
-                        <span>with {appt.staff?.name || "Specialist"}</span>
-                        <span className="text-slate-300">•</span>
-                        <span className="flex items-center gap-1">
-                          <Clock size={11} /> {appt.start_time.substring(0, 5)} ({appt.service?.duration || 30} min)
+                    
+                    <div className="space-y-1">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <h4 className="font-extrabold text-slate-900 text-base sm:text-lg leading-snug">
+                          {appt.service?.name || "Service Session"}
+                        </h4>
+                        <span
+                          className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider ${
+                            statusStyles[statusLower] || "bg-slate-100 text-slate-600 border border-slate-200"
+                          }`}
+                        >
+                          {appt.status}
                         </span>
-                        <span className="text-slate-300">•</span>
-                        <span className="font-bold text-indigo-600">${appt.service?.price || "0.00"}</span>
-                      </p>
+                      </div>
+
+                      <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-slate-600 text-xs pt-0.5">
+                        <div className="flex items-center gap-1.5 font-semibold">
+                          <User size={13} className="text-slate-400" />
+                          <span>{appt.staff?.name || "Specialist"}</span>
+                        </div>
+                        <span className="text-slate-300 hidden sm:inline">•</span>
+                        <div className="flex items-center gap-1.5 text-slate-500 font-medium">
+                          <Clock size={13} className="text-slate-400" />
+                          <span>{appt.start_time.substring(0, 5)} ({appt.service?.duration || 30} min)</span>
+                        </div>
+                        <span className="text-slate-300 hidden sm:inline">•</span>
+                        <div className="font-extrabold text-blue-600">
+                          ${appt.service?.price || "0.00"}
+                        </div>
+                      </div>
                     </div>
                   </div>
-                  <div className="flex flex-wrap items-center justify-between sm:justify-end gap-3 border-t sm:border-t-0 pt-3 sm:pt-0">
-                    <span
-                      className={`px-2.5 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider ${
-                        statusStyles[appt.status.toLowerCase()] || "bg-slate-100 text-slate-500"
-                      }`}
+
+                  <div className="flex items-center gap-2.5 pt-3 lg:pt-0 border-t lg:border-t-0 border-slate-100 justify-end">
+                    {/* View Details - Always shown */}
+                    <button
+                      onClick={() => onViewDetails(appt)}
+                      className="px-3.5 py-2 border border-slate-200 text-slate-700 hover:text-blue-600 hover:border-blue-200 hover:bg-blue-50/50 rounded-xl font-bold text-xs flex items-center gap-1.5 transition-all active:scale-95 shadow-2xs"
                     >
-                      {appt.status}
-                    </span>
+                      <Eye size={14} />
+                      View Details
+                    </button>
 
-                    <div className="flex items-center gap-2">
-                      {/* View Details Action */}
+                    {/* Completed Appt Actions */}
+                    {isCompleted && (
+                      <>
+                        {!isReviewed ? (
+                          <button
+                            onClick={() => onLeaveReview(appt.id)}
+                            className="px-3.5 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold text-xs flex items-center gap-1.5 shadow-sm transition-all active:scale-95"
+                          >
+                            <Star size={14} className="fill-white" />
+                            Leave Review
+                          </button>
+                        ) : (
+                          <button
+                            onClick={() => onViewDetails(appt)}
+                            className="px-3.5 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl font-bold text-xs flex items-center gap-1.5 transition-all"
+                          >
+                            <Star size={14} className="fill-amber-400 text-amber-400" />
+                            View Review
+                          </button>
+                        )}
+                      </>
+                    )}
+
+                    {/* Upcoming Appt Actions */}
+                    {isUpcoming && (
                       <button
-                        onClick={() => onViewDetails(appt)}
-                        className="px-3 py-1.5 border border-slate-200 text-slate-600 hover:text-indigo-600 hover:border-indigo-200 hover:bg-indigo-50/30 rounded-lg font-semibold text-xs flex items-center gap-1 transition-all"
-                        title="View Details"
+                        onClick={() => handleCancel(appt.id)}
+                        disabled={cancellingId === appt.id}
+                        className="px-3.5 py-2 text-rose-600 hover:bg-rose-50 border border-rose-200/60 rounded-xl font-bold text-xs flex items-center gap-1.5 transition-all active:scale-95 disabled:opacity-50"
                       >
-                        <Eye size={12} />
-                        Details
+                        {cancellingId === appt.id ? (
+                          <Loader2 size={14} className="animate-spin" />
+                        ) : (
+                          <Trash2 size={14} />
+                        )}
+                        Cancel
                       </button>
-
-                      {/* Review Actions */}
-                      {isCompleted && (
-                        <>
-                          {!isReviewed ? (
-                            <button
-                              onClick={() => onLeaveReview(appt.id)}
-                              className="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-semibold text-xs flex items-center gap-1 shadow-sm transition-all"
-                            >
-                              <Star size={12} className="fill-white" />
-                              Leave Review
-                            </button>
-                          ) : (
-                            <button
-                              onClick={() => onViewDetails(appt)}
-                              className="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-lg font-semibold text-xs flex items-center gap-1 transition-all"
-                            >
-                              <Star size={12} className="fill-yellow-500 text-yellow-500" />
-                              View Review
-                            </button>
-                          )}
-                        </>
-                      )}
-
-                      {/* Cancel Action */}
-                      {showCancelBtn && (
-                        <button
-                          onClick={() => handleCancel(appt.id)}
-                          disabled={cancellingId === appt.id}
-                          className="p-1.5 text-slate-400 hover:text-red-600 transition-colors border border-transparent hover:border-red-100 hover:bg-red-50 rounded-lg disabled:opacity-50"
-                          title="Cancel Appointment"
-                        >
-                          {cancellingId === appt.id ? (
-                            <Loader2 size={14} className="animate-spin" />
-                          ) : (
-                            <Trash2 size={14} />
-                          )}
-                        </button>
-                      )}
-                    </div>
+                    )}
                   </div>
                 </div>
               );
             })
           ) : (
-            <div className="text-center py-16 bg-white rounded-xl border border-slate-200/80 shadow-sm">
-              <p className="text-slate-400 italic text-sm">No appointments in this view.</p>
+            <div className="text-center py-16 bg-white/80 backdrop-blur rounded-2xl border border-slate-200/80 shadow-sm">
+              <Calendar size={32} className="mx-auto text-slate-300 mb-3" />
+              <p className="text-slate-600 font-bold text-base mb-1">No appointments found</p>
+              <p className="text-slate-400 text-xs">There are no bookings matching your selected view.</p>
             </div>
           )}
         </div>
@@ -174,3 +184,4 @@ export default function AppointmentList({
     </>
   );
 }
+

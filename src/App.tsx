@@ -34,7 +34,6 @@ const StaffWorkingHours = lazy(() => import("./pages/Staff/WorkingHours"));
 const StaffChangePassword = lazy(() => import("./pages/Staff/ChangePassword"));
 
 // Customer Pages
-const CustomerDashboard = lazy(() => import("./pages/Customer/Dashboard"));
 const CustomerSchedule = lazy(() => import("./pages/Customer/Schedule"));
 const CustomerBookAppointment = lazy(() => import("./pages/Customer/BookAppointment"));
 
@@ -88,7 +87,7 @@ export default function App() {
 
         {/* Customer Routes with Nested Layout */}
         <Route path="/customer" element={<CustomerLayout />}>
-          <Route index element={<CustomerDashboard />} />
+          <Route index element={<CustomerSchedule />} />
           <Route path="schedule" element={<CustomerSchedule />} />
           <Route path="book" element={<CustomerBookAppointment />} />
           <Route path="connections" element={<ConnectionsPage />} />

@@ -1,4 +1,4 @@
-import { Loader2 } from "lucide-react";
+import { Loader2, MoveLeft, MoveRight } from "lucide-react";
 
 interface Service {
   id: number;
@@ -42,9 +42,12 @@ export default function StepperFooter({
       <button
         disabled={step === 1}
         onClick={() => setStep((prev) => prev - 1)}
-        className="px-6 py-3 rounded-2xl border border-slate-200 text-slate-500 font-bold text-xs uppercase tracking-wider hover:bg-slate-50 transition-all disabled:opacity-0"
+        className="px-6 py-3 rounded-2xl border border-slate-200 text-slate-800 font-bold text-xs uppercase tracking-wider hover:bg-slate-50 transition-all disabled:opacity-0"
       >
-        Go Back
+        <div className="flex gap-2 items-center">
+          <MoveLeft size={14} className="text-slate-800" />
+          Back
+        </div>
       </button>
 
       {step < 4 ? (
@@ -55,13 +58,12 @@ export default function StepperFooter({
             (step === 3 && !selectedSlot)
           }
           onClick={() => setStep((prev) => prev + 1)}
-          className="px-8 py-3.5 rounded-2xl bg-indigo-600 text-white font-bold text-xs uppercase tracking-wider shadow-lg shadow-indigo-600/20 hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50"
+          className="px-6 py-3.5 rounded-2xl bg-indigo-600 text-white font-bold text-xs uppercase tracking-wider shadow-lg shadow-indigo-600/20 hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50"
         >
-          {step === 1
-            ? "Continue to Staff"
-            : step === 2
-              ? "Continue to Schedule"
-              : "Continue to Review"}
+          <div className="flex gap-2 items-center">
+            Continue
+            <MoveRight size={14} />
+          </div>
         </button>
       ) : (
         <button

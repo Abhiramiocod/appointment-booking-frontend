@@ -1,21 +1,19 @@
 interface HeaderProps {
-  step: number;
+  step?: number;
 }
 
-export default function Header({ step }: HeaderProps) {
+export default function Header({ step: _step }: HeaderProps) {
   return (
-    <div className="flex justify-between items-center">
+    <div className="flex justify-between items-center mb-6">
       <div>
-        <h1 className="text-2xl font-bold text-slate-900 tracking-tight mb-1">
-          Reserve Excellence
+        <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight mb-1.5">
+          Book an Appointment
         </h1>
-        <p className="text-slate-500 text-xs">
-          {step === 1 && "Step 1 of 4: Select your premium wellness experience"}
-          {step === 2 && "Step 2 of 4: Select your specialist"}
-          {step === 3 && "Step 3 of 4: Select date and available time slot"}
-          {step === 4 && "Step 4 of 4: Review and confirm your booking"}
+        <p className="text-slate-500 text-xs sm:text-sm leading-relaxed max-w-xl">
+          Choose a service, select your preferred specialist, pick a convenient time, and confirm your booking.
         </p>
       </div>
     </div>
   );
 }
+

@@ -167,61 +167,73 @@ export default function LuminaCustomerDashboard() {
     rawService: srv,
     icon: Leaf,
     name: srv.name,
-    desc: `${srv.duration} min session • Premium wellness`,
+    desc: `${srv.duration} min session • Premium care`,
     price: `$${srv.price}`,
   }));
 
   return (
-    <div style={{ padding: "20px 24px", flex: 1, width: "100%" }}>
+    <div className="font-sans antialiased text-slate-800" style={{ padding: "28px 32px", flex: 1, width: "100%", maxWidth: "1400px", margin: "0 auto" }}>
       {/* Greeting */}
-      <Greeting />
+      <Greeting
+        nextAppointment={
+          featuredAppt
+            ? {
+                staffName: featuredAppt.staff?.name,
+                serviceName: featuredAppt.service?.name,
+                date: featuredAppt.appointment_date,
+                startTime: featuredAppt.start_time,
+              }
+            : null
+        }
+      />
 
       {/* Reschedule Proposal Alert Card */}
       {rescheduleProposal && (
-        <div className="mt-6 bg-indigo-50 border border-indigo-200/80 rounded-2xl p-5 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4 animation-fadeInUp">
+        <div className="mt-6 bg-gradient-to-r from-blue-50/90 via-indigo-50/90 to-blue-50/90 border border-blue-200/80 rounded-2xl p-5 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4 animate-fadeIn">
           <div className="space-y-1.5">
-            <h3 className="text-sm font-extrabold text-indigo-950 flex items-center gap-2">
-              <span className="w-2 h-2 rounded-full bg-indigo-600 animate-pulse" />
+            <h3 className="text-sm font-bold text-indigo-950 flex items-center gap-2">
+              <span className="w-2.5 h-2.5 rounded-full bg-blue-600 animate-ping" />
+              <span className="w-2.5 h-2.5 rounded-full bg-blue-600 -ml-5" />
               Proposed Schedule Change
             </h3>
-            <p className="text-slate-600 text-xs">
+            <p className="text-slate-600 text-xs leading-relaxed">
               Specialist <span className="font-semibold text-slate-800">{rescheduleProposal.staff?.name}</span> requested a reschedule for your booking <span className="font-semibold text-slate-800">({rescheduleProposal.service?.name})</span>.
             </p>
             
-            <div className="flex flex-wrap items-center gap-4 mt-2 bg-white/70 p-3 rounded-xl border border-indigo-100 text-xs">
+            <div className="flex flex-wrap items-center gap-4 mt-2 bg-white/80 backdrop-blur p-3 rounded-xl border border-indigo-100/80 text-xs">
               <div>
-                <p className="text-[9px] text-slate-400 font-bold uppercase tracking-wider">Current Schedule</p>
-                <p className="font-bold text-slate-700 mt-0.5">{rescheduleProposal.appointment_date} at {rescheduleProposal.start_time.substring(0, 5)}</p>
+                <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Current Schedule</p>
+                <p className="font-semibold text-slate-700 mt-0.5">{rescheduleProposal.appointment_date} at {rescheduleProposal.start_time.substring(0, 5)}</p>
               </div>
-              <div className="h-5 w-px bg-slate-200 hidden sm:block" />
+              <div className="h-6 w-px bg-slate-200 hidden sm:block" />
               <div>
-                <p className="text-[9px] text-indigo-500 font-bold uppercase tracking-wider">Proposed Schedule</p>
-                <p className="font-bold text-indigo-700 mt-0.5">{rescheduleProposal.proposed_date} at {rescheduleProposal.proposed_time?.substring(0, 5)}</p>
+                <p className="text-[10px] text-blue-600 font-bold uppercase tracking-wider">Proposed Schedule</p>
+                <p className="font-semibold text-blue-700 mt-0.5">{rescheduleProposal.proposed_date} at {rescheduleProposal.proposed_time?.substring(0, 5)}</p>
               </div>
             </div>
 
             {rescheduleProposal.proposed_note && (
-              <p className="text-slate-500 italic text-[11px] mt-1.5">
-                " {rescheduleProposal.proposed_note} "
+              <p className="text-slate-500 italic text-xs mt-1.5 bg-indigo-50/50 p-2 rounded-lg border border-indigo-100/40">
+                "{rescheduleProposal.proposed_note}"
               </p>
             )}
           </div>
 
-          <div className="flex gap-2 shrink-0 self-end md:self-center">
+          <div className="flex gap-2.5 shrink-0 self-end md:self-center">
             <button
               onClick={() => handleAcceptReschedule(rescheduleProposal.id)}
               disabled={actioningId !== null}
-              className="px-3.5 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-xs font-bold transition-all flex items-center gap-1 shadow-sm disabled:opacity-50"
+              className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-semibold transition-all flex items-center gap-1.5 shadow-sm active:scale-95 disabled:opacity-50"
             >
-              {actioningId === rescheduleProposal.id ? <Loader2 size={12} className="animate-spin" /> : <Check size={12} />}
+              {actioningId === rescheduleProposal.id ? <Loader2 size={13} className="animate-spin" /> : <Check size={13} />}
               Accept New Time
             </button>
             <button
               onClick={() => handleDeclineReschedule(rescheduleProposal.id)}
               disabled={actioningId !== null}
-              className="px-3.5 py-1.5 bg-white border border-slate-200 hover:bg-red-50 hover:text-red-700 hover:border-red-100 rounded-lg text-xs font-bold transition-all flex items-center gap-1 shadow-sm disabled:opacity-50"
+              className="px-4 py-2 bg-white border border-slate-200 hover:bg-rose-50 hover:text-rose-600 hover:border-rose-200 rounded-xl text-xs font-semibold transition-all flex items-center gap-1.5 shadow-sm active:scale-95 disabled:opacity-50 text-slate-700"
             >
-              <X size={12} />
+              <X size={13} />
               Decline
             </button>
           </div>
@@ -229,12 +241,12 @@ export default function LuminaCustomerDashboard() {
       )}
 
       {/* Stats */}
-      <div className="mt-6">
+      <div className="mt-7">
         <Stats stats={statsList} />
       </div>
 
       {/* Featured appointment + quick actions */}
-      <section className="grid grid-cols-1 lg:grid-cols-12 gap-6 mt-6">
+      <section className="grid grid-cols-1 lg:grid-cols-12 gap-6 mt-7">
         {/* Featured card */}
         <FeaturedCard appt={featuredAppt || null} onViewDetails={(appt) => setSelectedApptDetails(appt as any)} onCancel={handleCancel} />
 
@@ -242,16 +254,17 @@ export default function LuminaCustomerDashboard() {
         <QuickActions quickActions={quickActions} />
       </section>
 
-      {/* Recent activity + recommended */}
-      <section className="grid grid-cols-1 lg:grid-cols-12 gap-6 mt-6">
-        {/* Recent activity table */}
+      {/* Recent activity */}
+      <section className="mt-7">
         {loading ? (
-          <div className="lg:col-span-8 bg-white p-8 flex justify-center items-center rounded-2xl border"><Loader2 className="animate-spin text-indigo-600" /></div>
+          <div className="bg-white p-12 flex justify-center items-center rounded-2xl border border-slate-200/80 shadow-sm"><Loader2 className="animate-spin text-blue-600" size={28} /></div>
         ) : (
           <RecentActivity activity={mappedActivity} onViewDetails={(appt) => setSelectedApptDetails(appt as any)} onCancel={handleCancel} />
         )}
+      </section>
 
-        {/* Recommended */}
+      {/* Recommended Services Section */}
+      <section className="mt-7">
         <Recommended recommended={recommendedList} />
       </section>
 
@@ -261,8 +274,8 @@ export default function LuminaCustomerDashboard() {
           appt={selectedApptDetails as any}
           statusStyles={{
             confirmed: "bg-emerald-50 text-emerald-700 border border-emerald-200/50",
-            pending: "bg-indigo-50 text-indigo-600 border border-indigo-200/50",
-            completed: "bg-blue-50 text-blue-700 border border-blue-200/50",
+            pending: "bg-blue-50 text-blue-600 border border-blue-200/50",
+            completed: "bg-indigo-50 text-indigo-700 border border-indigo-200/50",
             cancelled: "bg-slate-100 text-slate-600 border border-slate-200/50",
             rejected: "bg-rose-50 text-rose-700 border border-rose-200/50",
             reschedule_requested: "bg-amber-50 text-amber-700 border border-amber-200/50",
@@ -282,3 +295,4 @@ export default function LuminaCustomerDashboard() {
     </div>
   );
 }
+
