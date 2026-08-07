@@ -1,4 +1,4 @@
-import { LayoutDashboard, CalendarDays, LayoutGrid, MessageSquareText, Clock } from 'lucide-react';
+import { LayoutDashboard, CalendarDays, LayoutGrid, MessageSquareText, Clock, Link2 } from 'lucide-react';
 
 export interface NavSubItem {
   label: string;
@@ -19,4 +19,5 @@ export const navItems: NavItem[] = [
   { label: "Working Hours", icon: Clock, path: "/staff/working-hours" },
   { label: "Services", icon: LayoutGrid, path: "/staff/services" },
   { label: "Reviews", icon: MessageSquareText, path: "/staff/reviews" },
+  { label: "Connections", icon: Link2, path: "/staff/connections" },
 ];

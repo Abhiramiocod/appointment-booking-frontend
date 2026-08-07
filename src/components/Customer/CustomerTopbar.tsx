@@ -72,7 +72,21 @@ export default function CustomerTopbar() {
   };
 
   const [imgError, setImgError] = useState(false);
-  const userImageUrl = !imgError && currentUser?.image ? currentUser.image : "";
+
+  useEffect(() => {
+    setImgError(false);
+  }, [currentUser?.image]);
+
+  const getImageUrl = (image: string | null | undefined) => {
+    if (!image) return "";
+    if (image.startsWith("http://") || image.startsWith("https://") || image.startsWith("blob:")) {
+      return image;
+    }
+    const backendUrl = import.meta.env.VITE_API_BASE_URL?.replace("/api", "");
+    return `${backendUrl}/storage/${image}`;
+  };
+
+  const userImageUrl = !imgError && currentUser?.image ? getImageUrl(currentUser.image) : "";
 
   return (
     <header
@@ -251,12 +265,18 @@ export default function CustomerTopbar() {
                 alt={currentUser?.name || "User avatar"}
                 width={40}
                 height={40}
+                referrerPolicy="no-referrer"
                 className="w-10 h-10 rounded-full object-cover object-center border-2 border-gray-200 hover:border-indigo-500 transition-all duration-200"
                 loading="eager"
                 draggable={false}
-                onError={() => setImgError(true)}
+                onError={(e) => {
+                  console.warn("Topbar avatar image failed to load:", userImageUrl);
+                  setImgError(true);
+                }}
               />
-            ) : (
+            ) : null}
+
+            {!userImageUrl && (
               <div className="w-10 h-10 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-700 font-semibold border-2 border-indigo-200">
                 {currentUser?.name ? (
                   currentUser.name.charAt(0).toUpperCase()

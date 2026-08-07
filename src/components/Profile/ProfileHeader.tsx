@@ -22,7 +22,17 @@ export default function ProfileHeader({
   const provider = user?.provider ? user.provider.toLowerCase() : "local";
   const isVerified = Boolean(user?.email_verified_at);
 
-  const displayAvatar = avatarPreview || user?.image;
+  const rawAvatar = avatarPreview || user?.image;
+  const getImageUrl = (img: string | null | undefined) => {
+    if (!img) return null;
+    if (img.startsWith("blob:") || img.startsWith("http://") || img.startsWith("https://")) {
+      return img;
+    }
+    const backendUrl = import.meta.env.VITE_API_BASE_URL?.replace("/api", "");
+    return `${backendUrl}/storage/${img}`;
+  };
+
+  const displayAvatar = getImageUrl(rawAvatar);
 
   // Role Badge Styling
   const roleBadgeConfig: Record<string, { label: string; bg: string; text: string; border: string }> = {
@@ -51,7 +61,11 @@ export default function ProfileHeader({
               <img
                 src={displayAvatar}
                 alt={user?.name || "User Avatar"}
+                referrerPolicy="no-referrer"
                 className="w-full h-full object-cover"
+                onError={(e) => {
+                  console.warn("ProfileHeader avatar image failed to load:", displayAvatar);
+                }}
               />
             ) : (
               <div className="w-full h-full bg-gradient-to-tr from-indigo-600 to-indigo-500 text-white flex items-center justify-center text-4xl font-semibold uppercase tracking-wider">
